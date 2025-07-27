@@ -5,6 +5,11 @@ import (
 )
 
 var (
-	CursorStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-	NoStyle     = lipgloss.NewStyle()
+	MainTheme     = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
+	TerminalStyle = lipgloss.NewStyle().Padding(1, 2)
+	NoStyle       = lipgloss.NewStyle()
 )
+
+func JoinHorizontal(strs ...string) string {
+	return lipgloss.JoinHorizontal(lipgloss.Center, strs...)
+}

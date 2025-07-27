@@ -19,16 +19,13 @@ func openEditor() tea.Cmd {
 }
 
 func main() {
-	input := textinput.InitialInput()
-
+	input := textinput.NewTextInput()
+	storage := storage.NewStorage()
 	m := terminal{
-		input: &input,
-		storage: &storage.Storage{
-			User: storage.User{
-				Username: "aykleo",
-			},
-		},
+		input:   input,
+		storage: storage,
 	}
+
 	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
 		fmt.Println("Error running program:", err)
 		os.Exit(1)

@@ -14,8 +14,10 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 		default:
-			updatedModel, inputCmd := m.input.Update(msg)
-			*m.input = updatedModel.(textinput.Input)
+			inputModel, inputCmd := m.input.Update(msg)
+			if newInput, ok := inputModel.(textinput.ITextInput); ok {
+				m.input = newInput
+			}
 			return m, inputCmd
 		}
 	case editorFinishedMsg:
@@ -29,7 +31,10 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	updatedModel, cmd := m.input.Update(msg)
-	*m.input = updatedModel.(textinput.Input)
+	// Handle other messages by updating the input
+	inputModel, cmd := m.input.Update(msg)
+	if newInput, ok := inputModel.(textinput.ITextInput); ok {
+		m.input = newInput
+	}
 	return m, cmd
 }

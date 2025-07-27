@@ -4,7 +4,6 @@ import (
 	"github.com/aykleo/ion/ui/styles"
 	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 type (
@@ -17,20 +16,17 @@ type Input struct {
 	err        error
 }
 
-func InitialInput() Input {
+func InitInput() Input {
 	ti := textinput.New()
 	ti.Placeholder = "Pikachu"
 	ti.Focus()
-	ti.PromptStyle = styles.CursorStyle
-	ti.TextStyle = styles.CursorStyle
+	ti.PromptStyle = styles.MainTheme
+	ti.TextStyle = styles.MainTheme
+	ti.Cursor.Style = styles.MainTheme
 	ti.Width = 20
 
 	return Input{
 		input: ti,
 		err:   nil,
 	}
-}
-
-func (m Input) Init() tea.Cmd {
-	return textinput.Blink
 }

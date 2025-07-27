@@ -10,6 +10,16 @@ type Storage struct {
 	Aliases   []Alias
 }
 
+func InitStorage() Storage {
+	return Storage{
+		User: User{
+			Username: "aykleo",
+		},
+		Passwords: []Password{},
+		Aliases:   []Alias{},
+	}
+}
+
 type Password struct {
 	ID        string
 	Value     string
@@ -27,4 +37,27 @@ type Alias struct {
 
 type User struct {
 	Username string
+}
+
+type IStorage interface {
+	GetUser() User
+	GetPasswords() []Password
+	GetAliases() []Alias
+}
+
+func (s *Storage) GetUser() User {
+	return s.User
+}
+
+func (s *Storage) GetPasswords() []Password {
+	return s.Passwords
+}
+
+func (s *Storage) GetAliases() []Alias {
+	return s.Aliases
+}
+
+func NewStorage() IStorage {
+	storage := InitStorage()
+	return &storage
 }

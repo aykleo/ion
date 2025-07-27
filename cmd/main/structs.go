@@ -12,10 +12,10 @@ type terminal struct {
 	width   int
 	height  int
 	err     error
-	storage *storage.Storage
-	input   *textinput.Input
+	storage storage.IStorage
+	input   textinput.ITextInput
 }
 
 func (m terminal) Init() tea.Cmd {
-	return nil
+	return m.input.Init()
 }
