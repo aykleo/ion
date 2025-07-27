@@ -18,7 +18,8 @@ type Input struct {
 
 func InitInput() Input {
 	ti := textinput.New()
-	ti.Placeholder = "Pikachu"
+	ti.Placeholder = "Type your command"
+	ti.PlaceholderStyle = styles.Placeholder
 	ti.Focus()
 	ti.PromptStyle = styles.MainTheme
 	ti.TextStyle = styles.MainTheme

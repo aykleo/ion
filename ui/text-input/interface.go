@@ -13,7 +13,7 @@ type ITextInput interface {
 }
 
 func (m *Input) SetWidth(width int) {
-	m.input.Width = width / 2
+	m.input.Width = int(float64(width) * 0.95)
 }
 
 func (m *Input) Init() tea.Cmd {

@@ -17,7 +17,7 @@ func (m terminal) View() string {
 func (m terminal) UserInput() string {
 	var b strings.Builder
 	username := m.storage.GetUser().Username
-	b.WriteString(styles.MainTheme.Render("~"))
+	b.WriteString(styles.MainTheme.Render("~/"))
 	b.WriteString(styles.MainTheme.Render(username))
 	b.WriteString(styles.MainTheme.Render(" "))
 	content := styles.JoinHorizontal(b.String(), m.input.View())
