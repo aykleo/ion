@@ -4,22 +4,17 @@ import (
 	"strings"
 
 	"github.com/aykleo/ion/ui/styles"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func (m terminal) View() string {
 	if m.err != nil {
 		return "Error: " + m.err.Error() + "\n"
 	}
-	content := styles.JoinVertical(m.UserInput(), m.Folder())
+	pager := lipgloss.NewStyle().Padding(1, 0, 0, 0).Render(m.pager.View())
+	content := styles.JoinVertical(m.UserInput(), pager)
 	content = styles.TerminalStyle.Render(content)
 	return content
-}
-
-func (m terminal) Folder() string {
-	var b strings.Builder
-	b.WriteString("\n")
-	b.WriteString(styles.FolderStyle.Render(m.currentFolder))
-	return b.String()
 }
 
 func (m terminal) UserInput() string {

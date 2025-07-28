@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/aykleo/ion/storage"
+	pager "github.com/aykleo/ion/ui/pager"
 	textinput "github.com/aykleo/ion/ui/text-input"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -17,6 +18,7 @@ type terminal struct {
 	currentFolder string
 	storage       storage.IStorage
 	input         textinput.ITextInput
+	pager         pager.IPager
 }
 
 func (m terminal) Init() tea.Cmd {

@@ -1,24 +1,20 @@
 package main
 
 import (
-	textinput "github.com/aykleo/ion/ui/text-input"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmd tea.Cmd
 
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			return m, tea.Quit
 		default:
-			inputModel, inputCmd := m.input.Update(msg)
-			if newInput, ok := inputModel.(textinput.ITextInput); ok {
-				m.input = newInput
-			}
-			return m, inputCmd
+			_, pagerCmd := m.pager.Update(msg)
+			_, inputCmd := m.input.Update(msg)
+			return m, tea.Batch(inputCmd, pagerCmd)
 		}
 	case editorFinishedMsg:
 		if msg.err != nil {
@@ -28,12 +24,11 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 		m.input.SetWidth(m.width)
-		return m, nil
+		_, pagerCmd := m.pager.Update(msg)
+		return m, pagerCmd
 	}
 
-	inputModel, cmd := m.input.Update(msg)
-	if newInput, ok := inputModel.(textinput.ITextInput); ok {
-		m.input = newInput
-	}
-	return m, cmd
+	_, inputCmd := m.input.Update(msg)
+	_, pagerCmd := m.pager.Update(msg)
+	return m, tea.Batch(inputCmd, pagerCmd)
 }
