@@ -12,6 +12,7 @@ type Storage struct {
 
 type Password struct {
 	ID        string
+	Salt      string
 	Value     string
 	Tags      []string
 	CreatedAt time.Time

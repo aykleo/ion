@@ -15,6 +15,10 @@ func main() {
 	config := config.Init()
 	input := textinput.NewTextInput()
 	storage := storage.NewStorage()
+	storageFields, exists := storage.GetOrCreateStorageFields(config.GetPath())
+	if exists {
+		storage = storageFields
+	}
 	folder := getFolderFromOs()
 	pager := pager.NewPager()
 	m := terminal{

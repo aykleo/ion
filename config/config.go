@@ -11,7 +11,7 @@ type Config struct {
 
 const (
 	IonPath     = "ion"
-	StoragePath = "storage"
+	StoragePath = "data"
 )
 
 type IConfig interface {
