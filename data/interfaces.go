@@ -11,7 +11,11 @@ type IData interface {
 	GetData() IData
 
 	GetOrCreateDataFields(path string) (IData, bool)
+
 	SetUsername(name, path string)
+
+	AddSecret(args []string, path string) error
+	UpdateSecret(args []string, path string) error
 }
 
 func (s *Data) GetUser() User {
@@ -59,18 +63,4 @@ func (s *Data) GetOrCreateDataFields(path string) (IData, bool) {
 	}
 
 	return &data, true
-}
-
-func (s *Data) SetUsername(name, path string) {
-	s.User.Username = name
-
-	dataPath := filepath.Join(path, "data.json")
-	jsonData, err := json.MarshalIndent(s, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-
-	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
-		panic(err)
-	}
 }

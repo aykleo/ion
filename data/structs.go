@@ -5,12 +5,12 @@ import (
 )
 
 type Data struct {
-	User      User
-	Passwords []Password
-	Aliases   []Alias
+	User    User
+	Secrets []Secret
+	Aliases []Alias
 }
 
-type Password struct {
+type Secret struct {
 	ID        string
 	Salt      string
 	Value     string

@@ -86,23 +86,58 @@ func handleCDCommand(fullCommand string) CommandFinishedMsg {
 func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 	configPath := config.GetConfigPath()
 
-	if len(args) < 2 {
+	if args[0] == "ionize" && len(args) == 1 {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
-				Err:     errors.New("ion [command] <args>"),
+				Command: "ionize",
+				Output:  "ionize",
+			}
+		}
+	}
+	if len(args) < 3 {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     errors.New("ion [category] [action] <args>"),
 				Command: "ion",
-				Output:  "usage: ion [command] <args>",
+				Output:  "usage: ion [category] [action] <args>",
 				NewDir:  currentDir,
 			}
 		}
 	}
 
-	flags := args[1]
-	args = args[2:]
-	switch flags {
-	case "user":
-		return changeUsername(args, configPath, dataRef)
+	category := args[1]
+	action := args[2]
+	args = args[3:]
 
+	switch category {
+	case "user":
+		switch action {
+		case "set":
+			return changeUsername(args, configPath, dataRef)
+		default:
+			return func() tea.Msg {
+				return CommandFinishedMsg{
+					Command: "ion",
+					Output:  "command not found",
+					NewDir:  currentDir,
+				}
+			}
+		}
+	case "secret":
+		switch action {
+		case "add":
+			return addSecret(args, configPath, dataRef)
+		case "update":
+			return updateSecret(args, configPath, dataRef)
+		default:
+			return func() tea.Msg {
+				return CommandFinishedMsg{
+					Command: "ion",
+					Output:  "command not found",
+					NewDir:  currentDir,
+				}
+			}
+		}
 	default:
 		return func() tea.Msg {
 			return CommandFinishedMsg{

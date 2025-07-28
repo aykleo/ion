@@ -5,7 +5,7 @@ func InitData() Data {
 		User: User{
 			Username: "",
 		},
-		Passwords: []Password{},
-		Aliases:   []Alias{},
+		Secrets: []Secret{},
+		Aliases: []Alias{},
 	}
 }
