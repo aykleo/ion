@@ -9,7 +9,7 @@ type IPager interface {
 
 	SetWidth(width int) int
 	SetHeight(height int) int
-	SetCurrentPath(path string)
+	SetCurrentFolder(path string)
 
 	AppendCommand(msg string) (UpdateContentMsg, tea.Cmd)
 }
@@ -48,7 +48,7 @@ func (m *Pager) SetHeight(height int) int {
 
 }
 
-func (m *Pager) SetCurrentPath(path string) {
+func (m *Pager) SetCurrentFolder(path string) {
 	m.currentPath = path
 }
 

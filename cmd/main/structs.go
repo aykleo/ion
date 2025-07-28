@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/aykleo/ion/config"
 	"github.com/aykleo/ion/storage"
 	pager "github.com/aykleo/ion/ui/pager"
 	textinput "github.com/aykleo/ion/ui/text-input"
@@ -16,6 +17,7 @@ type terminal struct {
 	height        int
 	err           error
 	currentFolder string
+	config        config.IConfig
 	storage       storage.IStorage
 	input         textinput.ITextInput
 	pager         pager.IPager

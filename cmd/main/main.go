@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/aykleo/ion/config"
 	"github.com/aykleo/ion/storage"
 	pager "github.com/aykleo/ion/ui/pager"
 	textinput "github.com/aykleo/ion/ui/text-input"
@@ -20,6 +21,7 @@ func openEditor() tea.Cmd {
 }
 
 func main() {
+	config := config.Init()
 	input := textinput.NewTextInput()
 	storage := storage.NewStorage()
 	folder := getFolderFromOs()
@@ -29,8 +31,9 @@ func main() {
 		storage:       storage,
 		currentFolder: folder,
 		pager:         pager,
+		config:        config,
 	}
-	pager.SetCurrentPath(folder)
+	pager.SetCurrentFolder(folder)
 
 	if _, err := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion()).Run(); err != nil {
 		fmt.Println("Error running program:", err)
