@@ -31,7 +31,6 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 
-	// Handle other messages by updating the input
 	inputModel, cmd := m.input.Update(msg)
 	if newInput, ok := inputModel.(textinput.ITextInput); ok {
 		m.input = newInput

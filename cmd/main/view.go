@@ -10,8 +10,16 @@ func (m terminal) View() string {
 	if m.err != nil {
 		return "Error: " + m.err.Error() + "\n"
 	}
+	content := styles.JoinVertical(m.UserInput(), m.Folder())
+	content = styles.TerminalStyle.Render(content)
+	return content
+}
 
-	return m.UserInput()
+func (m terminal) Folder() string {
+	var b strings.Builder
+	b.WriteString("\n")
+	b.WriteString(styles.FolderStyle.Render(m.currentFolder))
+	return b.String()
 }
 
 func (m terminal) UserInput() string {
@@ -22,6 +30,5 @@ func (m terminal) UserInput() string {
 	b.WriteString(styles.MainTheme.Render(" "))
 	content := styles.JoinHorizontal(b.String(), m.input.View())
 
-	content = styles.TerminalStyle.Render(content)
 	return content
 }

@@ -21,9 +21,11 @@ func openEditor() tea.Cmd {
 func main() {
 	input := textinput.NewTextInput()
 	storage := storage.NewStorage()
+	folder := getFolderFromOs()
 	m := terminal{
-		input:   input,
-		storage: storage,
+		input:         input,
+		storage:       storage,
+		currentFolder: folder,
 	}
 
 	if _, err := tea.NewProgram(m, tea.WithAltScreen()).Run(); err != nil {
