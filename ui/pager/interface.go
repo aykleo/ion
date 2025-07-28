@@ -59,9 +59,8 @@ func (m *Pager) AppendCommand(msg string) (UpdateContentMsg, tea.Cmd) {
 	} else {
 		m.content = append(m.content[1:], msg)
 	}
+
 	return UpdateContentMsg{}, func() tea.Msg {
 		return UpdateContentMsg{}
 	}
 }
-
-type UpdateContentMsg struct{}

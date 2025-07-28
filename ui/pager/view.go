@@ -12,11 +12,14 @@ func (m *Pager) View() string {
 	if !m.ready {
 		return "\n  Initializing..."
 	}
-	return fmt.Sprintf("%s\n%s\n%s", m.headerView(m.currentPath), m.viewport.View(), m.footerView())
+
+	content := styles.PagerContentStyle.Render(m.viewport.View())
+
+	return fmt.Sprintf("%s\n%s\n%s", m.headerView(m.currentPath), content, m.footerView())
 }
 
 func (m *Pager) headerView(t string) string {
-	title := styles.PagerTitleStyle.Render(t)
+	title := styles.PagerTitleStyle.Render("📁 " + t)
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
 	line = styles.MainTheme.Render(line)
 	return styles.JoinHorizontal(title, line)

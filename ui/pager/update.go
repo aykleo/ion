@@ -1,8 +1,6 @@
 package pager
 
 import (
-	"strings"
-
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -34,16 +32,23 @@ func (m *Pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !m.ready {
 			m.viewport = viewport.New(m.SetWidth(msg.Width), m.SetHeight(msg.Height-verticalMarginHeight))
 			m.viewport.YPosition = headerHeight
-			m.viewport.SetContent(strings.Join(m.content, "\n"))
+			m.viewport.SetContent(m.wrapContent())
+			m.viewport.GotoBottom()
 			m.ready = true
 		} else {
+			oldScrollPercent := m.viewport.ScrollPercent()
 			m.viewport.Width = m.SetWidth(msg.Width)
 			m.viewport.Height = m.SetHeight(msg.Height - verticalMarginHeight)
+			m.viewport.SetContent(m.wrapContent())
+
+			if oldScrollPercent >= 0.99 {
+				m.viewport.GotoBottom()
+			}
 		}
 
 	case UpdateContentMsg:
-		m.viewport.SetContent(strings.Join(m.content, "\n"))
-		m.viewport.ScrollDown(len(m.content))
+		m.viewport.SetContent(m.wrapContent())
+		m.viewport.GotoBottom()
 		return m, nil
 	}
 

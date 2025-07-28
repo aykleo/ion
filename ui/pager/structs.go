@@ -4,6 +4,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 )
 
+type UpdateContentMsg struct{}
 type Pager struct {
 	content     []string
 	ready       bool

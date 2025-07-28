@@ -1,6 +1,8 @@
 package textinput
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/bubbles/cursor"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -43,16 +45,19 @@ func (m *Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 type CommandMsg struct {
-	Command string
-	Args    []string
+	Command      string
+	Args         []string
+	IsIonCommand bool
 }
 
 func (m *Input) doCommand(msg string) (tea.Cmd, error) {
 	defer m.input.Reset()
+	isIonCommand := strings.HasPrefix(msg, "ion")
 
 	command := CommandMsg{
-		Command: msg,
-		Args:    []string{},
+		Command:      msg,
+		Args:         []string{},
+		IsIonCommand: isIonCommand,
 	}
 
 	return func() tea.Msg {
