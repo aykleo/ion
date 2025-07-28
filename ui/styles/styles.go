@@ -4,10 +4,15 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+const (
+	MainThemeColor = "135"
+	FolderColor    = "2"
+)
+
 var (
-	MainTheme     = lipgloss.NewStyle().Foreground(lipgloss.Color("135"))
+	MainTheme     = lipgloss.NewStyle().Foreground(lipgloss.Color(MainThemeColor))
 	Placeholder   = MainTheme.Italic(true).Faint(true)
-	FolderStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("2")).Bold(false).Padding(1).Background(lipgloss.Color("135"))
+	FolderStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color(FolderColor)).Bold(false).Padding(1).Background(lipgloss.Color(MainThemeColor))
 	TerminalStyle = lipgloss.NewStyle().Padding(1, 2)
 	NoStyle       = lipgloss.NewStyle()
 )
@@ -16,13 +21,13 @@ var (
 	PagerTitleStyle = func() lipgloss.Style {
 		b := lipgloss.RoundedBorder()
 		b.Right = "├"
-		return lipgloss.NewStyle().BorderStyle(b).Padding(0, 1)
+		return MainTheme.BorderStyle(b).BorderForeground(lipgloss.Color(MainThemeColor)).Padding(0, 1)
 	}()
 
 	PagerInfoStyle = func() lipgloss.Style {
 		b := lipgloss.RoundedBorder()
 		b.Left = "┤"
-		return PagerTitleStyle.BorderStyle(b)
+		return PagerTitleStyle.BorderStyle(b).BorderForeground(lipgloss.Color(MainThemeColor))
 	}()
 )
 

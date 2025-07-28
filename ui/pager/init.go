@@ -4,7 +4,7 @@ import "github.com/charmbracelet/bubbles/viewport"
 
 func InitPager() Pager {
 	return Pager{
-		content: content,
+		content: make([]string, 0, 200),
 		ready:   false,
 		viewport: viewport.Model{
 			Width:  0,

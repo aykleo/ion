@@ -1,6 +1,8 @@
 package pager
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -32,7 +34,7 @@ func (m *Pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !m.ready {
 			m.viewport = viewport.New(m.SetWidth(msg.Width), m.SetHeight(msg.Height-verticalMarginHeight))
 			m.viewport.YPosition = headerHeight
-			m.viewport.SetContent(m.content)
+			m.viewport.SetContent(strings.Join(m.content, "\n"))
 			m.ready = true
 		} else {
 			m.viewport.Width = m.SetWidth(msg.Width)

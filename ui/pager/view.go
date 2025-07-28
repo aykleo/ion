@@ -18,11 +18,13 @@ func (m *Pager) View() string {
 func (m *Pager) headerView(t string) string {
 	title := styles.PagerTitleStyle.Render(t)
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
-	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
+	line = styles.MainTheme.Render(line)
+	return styles.JoinHorizontal(title, line)
 }
 
 func (m *Pager) footerView() string {
 	info := styles.PagerInfoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(info)))
-	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
+	line = styles.MainTheme.Render(line)
+	return styles.JoinHorizontal(line, info)
 }
