@@ -10,6 +10,8 @@ type IPager interface {
 	SetWidth(width int) int
 	SetHeight(height int) int
 	SetCurrentPath(path string)
+
+	AppendCommand(msg string) (UpdateContentMsg, tea.Cmd)
 }
 
 func NewPager() IPager {
@@ -49,3 +51,17 @@ func (m *Pager) SetHeight(height int) int {
 func (m *Pager) SetCurrentPath(path string) {
 	m.currentPath = path
 }
+
+func (m *Pager) AppendCommand(msg string) (UpdateContentMsg, tea.Cmd) {
+	contentSize := len(m.content)
+	if contentSize < 200 {
+		m.content = append(m.content, msg)
+	} else {
+		m.content = append(m.content[1:], msg)
+	}
+	return UpdateContentMsg{}, func() tea.Msg {
+		return UpdateContentMsg{}
+	}
+}
+
+type UpdateContentMsg struct{}

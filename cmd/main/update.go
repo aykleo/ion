@@ -1,6 +1,7 @@
 package main
 
 import (
+	textinput "github.com/aykleo/ion/ui/text-input"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -25,6 +26,10 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width, m.height = msg.Width, msg.Height
 		m.input.SetWidth(m.width)
 		_, pagerCmd := m.pager.Update(msg)
+		return m, pagerCmd
+
+	case textinput.CommandMsg:
+		_, pagerCmd := m.pager.AppendCommand(msg.Command)
 		return m, pagerCmd
 	}
 

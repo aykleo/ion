@@ -11,8 +11,17 @@ func (m *Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.Type {
-		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyEsc:
-			return m, tea.Quit
+
+		case tea.KeyEnter:
+			if m.input.Value() != "" {
+				currentMessage := m.input.Value()
+				inputCmd, err := m.doCommand(currentMessage)
+				if err != nil {
+					m.err = err
+					return m, nil
+				}
+				return m, inputCmd
+			}
 		}
 		switch msg.String() {
 
@@ -31,4 +40,22 @@ func (m *Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	m.input, cmd = m.input.Update(msg)
 	return m, cmd
+}
+
+type CommandMsg struct {
+	Command string
+	Args    []string
+}
+
+func (m *Input) doCommand(msg string) (tea.Cmd, error) {
+	defer m.input.Reset()
+
+	command := CommandMsg{
+		Command: msg,
+		Args:    []string{},
+	}
+
+	return func() tea.Msg {
+		return command
+	}, nil
 }

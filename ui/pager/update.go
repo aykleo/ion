@@ -40,6 +40,11 @@ func (m *Pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.viewport.Width = m.SetWidth(msg.Width)
 			m.viewport.Height = m.SetHeight(msg.Height - verticalMarginHeight)
 		}
+
+	case UpdateContentMsg:
+		m.viewport.SetContent(strings.Join(m.content, "\n"))
+		m.viewport.ScrollDown(len(m.content))
+		return m, nil
 	}
 
 	m.viewport, cmd = m.viewport.Update(msg)
