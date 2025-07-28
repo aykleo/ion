@@ -7,7 +7,7 @@ import (
 
 func InitInput() Input {
 	ti := textinput.New()
-	ti.Placeholder = "Type your command"
+	ti.Placeholder = "<shell-command> or ion <ion-command>"
 	ti.PlaceholderStyle = styles.Placeholder
 	ti.Focus()
 	ti.PromptStyle = styles.MainTheme
