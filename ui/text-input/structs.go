@@ -3,6 +3,7 @@ package textinput
 import (
 	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type (
@@ -10,7 +11,8 @@ type (
 )
 
 type Input struct {
-	input      textinput.Model
-	cursorMode cursor.Mode
-	err        error
+	input          textinput.Model
+	cursorMode     cursor.Mode
+	err            error
+	FirstWordStyle lipgloss.Style
 }

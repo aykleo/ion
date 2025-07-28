@@ -15,8 +15,11 @@ func InitInput() Input {
 	ti.Cursor.Style = styles.MainTheme
 	ti.Width = 20
 
+	firstWordStyle := styles.MainTheme
+
 	return Input{
-		input: ti,
-		err:   nil,
+		input:          ti,
+		err:            nil,
+		FirstWordStyle: firstWordStyle,
 	}
 }
