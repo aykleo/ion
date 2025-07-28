@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/aykleo/ion/config"
-	"github.com/aykleo/ion/storage"
+	"github.com/aykleo/ion/data"
 	pager "github.com/aykleo/ion/ui/pager"
 	textinput "github.com/aykleo/ion/ui/text-input"
 	tea "github.com/charmbracelet/bubbletea"
@@ -14,16 +14,16 @@ import (
 func main() {
 	config := config.Init()
 	input := textinput.NewTextInput()
-	storage := storage.NewStorage()
-	storageFields, exists := storage.GetOrCreateStorageFields(config.GetPath())
+	data := data.NewData()
+	dataFields, exists := data.GetOrCreateDataFields(config.GetPath())
 	if exists {
-		storage = storageFields
+		data = dataFields
 	}
 	folder := getFolderFromOs()
 	pager := pager.NewPager()
 	m := terminal{
 		input:         input,
-		storage:       storage,
+		data:          data,
 		currentFolder: folder,
 		pager:         pager,
 		config:        config,

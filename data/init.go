@@ -1,7 +1,7 @@
-package storage
+package data
 
-func InitStorage() Storage {
-	return Storage{
+func InitData() Data {
+	return Data{
 		User: User{
 			Username: "",
 		},

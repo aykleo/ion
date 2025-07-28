@@ -116,7 +116,7 @@ func FormatCommandOutput(output string) string {
 		return formatTable(trimmedOutput)
 	}
 
-	return CommandOutputStyle.Render(trimmedOutput)
+	return SuccessMessageStyle.Render(trimmedOutput)
 }
 
 func FormatSuccessMessage(message string) string {

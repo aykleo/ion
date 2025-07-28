@@ -1,11 +1,14 @@
 package exec
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/aykleo/ion/config"
+	"github.com/aykleo/ion/data"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -77,5 +80,37 @@ func handleCDCommand(fullCommand string) CommandFinishedMsg {
 		Command: fullCommand,
 		// Output:  "moved to " + currentDir,
 		NewDir: currentDir,
+	}
+}
+
+func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
+	configPath := config.GetConfigPath()
+
+	if len(args) < 2 {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     errors.New("ion [command] <args>"),
+				Command: "ion",
+				Output:  "usage: ion [command] <args>",
+				NewDir:  currentDir,
+			}
+		}
+	}
+
+	flags := args[1]
+	args = args[2:]
+	switch flags {
+	case "user":
+		return changeUsername(args, configPath, dataRef)
+
+	default:
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Command: "ion",
+				Output:  "command not found",
+				NewDir:  currentDir,
+				Err:     errors.New("command not found"),
+			}
+		}
 	}
 }

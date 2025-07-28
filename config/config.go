@@ -48,3 +48,17 @@ func Init() IConfig {
 	config.GetOrCreateStorage()
 	return &config
 }
+
+func GetConfigPath() string {
+	ionDir, err := os.UserConfigDir()
+	if err != nil {
+		panic(err)
+	}
+
+	storagePath := filepath.Join(ionDir, IonPath)
+	storagePath = filepath.Join(storagePath, StoragePath)
+	if _, err := os.Stat(storagePath); os.IsNotExist(err) {
+		os.MkdirAll(storagePath, 0755)
+	}
+	return storagePath
+}

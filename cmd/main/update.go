@@ -29,10 +29,11 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case textinput.CommandMsg:
 		isIonCommand := msg.IsIonCommand
-		formattedCommand := styles.FormatCommandPrompt(msg.Command, m.storage.GetUser().Username)
+		formattedCommand := styles.FormatCommandPrompt(msg.Command, m.data.GetUser().Username)
 		_, pagerCmd := m.pager.AppendCommand(formattedCommand)
 		if isIonCommand {
-			return m, pagerCmd
+			ionCmd := exec.ExecIonCommand(msg.Args, m.data)
+			return m, tea.Batch(pagerCmd, ionCmd)
 		} else {
 			execCmd := exec.ExecSysCommand(msg.Command, msg.Args)
 			return m, tea.Batch(pagerCmd, execCmd)
@@ -61,9 +62,6 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, pagerCmdOutput
 		}
 
-		// successMsg := styles.FormatSuccessMessage("Command executed successfully")
-		// _, pagerCmdSuccess := m.pager.AppendCommand(successMsg)
-		// return m, pagerCmdSuccess
 	}
 
 	_, inputCmd := m.input.Update(msg)

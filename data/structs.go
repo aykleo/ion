@@ -1,10 +1,10 @@
-package storage
+package data
 
 import (
 	"time"
 )
 
-type Storage struct {
+type Data struct {
 	User      User
 	Passwords []Password
 	Aliases   []Alias
