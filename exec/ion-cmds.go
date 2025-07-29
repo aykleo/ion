@@ -77,13 +77,9 @@ func updateSecret(args []string, configPath string, dataRef data.IData) tea.Cmd 
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret update accepts two optionals flags and two arguments\n\n")
-			b.WriteString("          ion secret update <name> <value> \n")
-			b.WriteString("          ion secret update -s <salt> <name> <value> \n")
-			b.WriteString("          ion secret update -t <tag1> <tag2> <name> <value>\n\n")
-			b.WriteString(" if no salt is provided, a random salt will be generated\n\n")
-			b.WriteString(" if no tags are provided, the secret will not have any tags\n\n")
-			b.WriteString(" example: ion secret update -s mysalt -t tag1 tag2 name value")
+			b.WriteString("ion secret update accepts two arguments\n\n")
+			b.WriteString("          ion secret update <name> <new-value> \n")
+			b.WriteString(" example: ion secret update cool-name cool-value")
 			return CommandFinishedMsg{
 				Err:     errors.New("ion secret update error"),
 				Command: strings.Join(args, " "),

@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-func (s *Data) extractArgs(args []string) (string, string, string, []string, error) {
+func (s *Data) extractArgs(args []string, generateSaltIfMissing bool) (string, string, string, []string, error) {
 	name, value, err := extractNameAndValue(args)
 	if err != nil {
 		return "", "", "", nil, err
@@ -26,7 +26,7 @@ func (s *Data) extractArgs(args []string) (string, string, string, []string, err
 	hasSalt, salt := detectSalt(args)
 	hasTags, tags := detectTags(args)
 
-	if !hasSalt {
+	if !hasSalt && generateSaltIfMissing {
 		salt = generateSalt()
 	}
 	tgs := []string{}
@@ -148,24 +148,6 @@ func detectTags(args []string) (bool, []string) {
 	return len(tags) > 0, tags
 }
 
-func detectKeepValue(args []string) (bool, int) {
-	for i, arg := range args {
-		if arg == "-k" || arg == "--keep-value" {
-			return true, i
-		}
-	}
-	return false, -1
-}
-
-func detectName(args []string) (bool, int) {
-	for i, arg := range args {
-		if arg == "-n" || arg == "--name" {
-			return true, i
-		}
-	}
-	return false, -1
-}
-
 func extractNameAndValue(args []string) (string, string, error) {
 	usedIndices := make(map[int]bool)
 
@@ -212,3 +194,21 @@ func extractNameAndValue(args []string) (string, string, error) {
 
 	return remaining[0], remaining[1], nil
 }
+
+// func detectKeepValue(args []string) (bool, int) {
+// 	for i, arg := range args {
+// 		if arg == "-k" || arg == "--keep-value" {
+// 			return true, i
+// 		}
+// 	}
+// 	return false, -1
+// }
+
+// func detectName(args []string) (bool, int) {
+// 	for i, arg := range args {
+// 		if arg == "-n" || arg == "--name" {
+// 			return true, i
+// 		}
+// 	}
+// 	return false, -1
+// }

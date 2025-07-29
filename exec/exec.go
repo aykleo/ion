@@ -117,6 +117,7 @@ func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 		default:
 			return func() tea.Msg {
 				return CommandFinishedMsg{
+					Err:     errors.New("command not found"),
 					Command: "ion",
 					Output:  "command not found",
 					NewDir:  currentDir,
@@ -132,6 +133,7 @@ func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 		default:
 			return func() tea.Msg {
 				return CommandFinishedMsg{
+					Err:     errors.New("command not found"),
 					Command: "ion",
 					Output:  "command not found",
 					NewDir:  currentDir,

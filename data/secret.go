@@ -18,7 +18,7 @@ func (s *Data) AddSecret(args []string, path string) error {
 		return errors.New("secret already exists, use ion secret update <name> <value> to change it")
 	}
 
-	name, value, salt, tgs, err := s.extractArgs(args)
+	name, value, salt, tgs, err := s.extractArgs(args, true)
 	if err != nil {
 		return err
 	}
@@ -57,25 +57,15 @@ func (s *Data) AddSecret(args []string, path string) error {
 }
 
 func (s *Data) UpdateSecret(args []string, path string) error {
-	if len(args) < 2 {
-		return errors.New("ion secret update <name> <value>")
+	if len(args) != 2 {
+		return errors.New("ion secret update <name> <new-value>")
 	}
 	exists, index := s.checkIfSecretExists(args[len(args)-2], path)
 	if !exists {
 		return errors.New(args[len(args)-2] + " was not found")
 	}
 
-	keepValue, keepValueIndex := detectKeepValue(args)
-	if keepValue && keepValueIndex != 0 {
-		return errors.New("the -k flag must be used right after 'ion secret update', its incompatible with the -n flag and deactivates the -s flag")
-	}
-
-	nameFlag, nameFlagIndex := detectName(args)
-	if nameFlag && nameFlagIndex != 0 {
-		return errors.New("the -n flag must be used right after 'ion secret update', its incompatible with the -k flag and deactivates the -s flag")
-	}
-
-	name, value, salt, tgs, err := s.extractArgs(args)
+	name, value, _, _, err := s.extractArgs(args, false)
 	if err != nil {
 		return err
 	}
@@ -95,34 +85,11 @@ func (s *Data) UpdateSecret(args []string, path string) error {
 	currentTags := data.Secrets[index].Tags
 	currentSalt := data.Secrets[index].Salt
 
-	if keepValue {
-		salt = currentSalt
-		value = data.Secrets[index].Value
-	}
-
-	if nameFlag {
-		name = value
-		value = data.Secrets[index].Value
-		salt = currentSalt
-	}
-
-	if salt == "" {
-		salt = currentSalt
-	}
-
-	if len(tgs) == 0 {
-		tgs = currentTags
-	}
-
-	if !keepValue && !nameFlag {
-		value = encrypt(salt, value)
-	}
-
 	data.Secrets[index] = Secret{
 		ID:        name,
-		Salt:      salt,
-		Value:     value,
-		Tags:      tgs,
+		Salt:      currentSalt,
+		Value:     encrypt(currentSalt, value),
+		Tags:      currentTags,
 		CreatedAt: data.Secrets[index].CreatedAt,
 		UpdatedAt: time.Now(),
 	}
