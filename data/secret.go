@@ -10,12 +10,12 @@ import (
 
 func (s *Data) AddSecret(args []string, path string) error {
 	if len(args) < 2 {
-		return errors.New("ion secret add <name> <value>")
+		return errors.New("invalid arguments, use ion secret add <name> <value> with optional -s <salt> and -t <tag1> <tag2>")
 	}
 
 	exists, _ := s.checkIfSecretExists(args[len(args)-2], path)
 	if exists {
-		return errors.New("secret already exists, use ion secret update <name> <value> to change it")
+		return errors.New("secret already exists, use ion secret update <name> <new-value> to change it")
 	}
 
 	name, value, salt, tgs, err := s.extractArgs(args, true)
@@ -56,13 +56,13 @@ func (s *Data) AddSecret(args []string, path string) error {
 	return nil
 }
 
-func (s *Data) UpdateSecret(args []string, path string) error {
+func (s *Data) UpdateSecretValue(args []string, path string) error {
 	if len(args) != 2 {
-		return errors.New("ion secret update <name> <new-value>")
+		return errors.New("invalid arguments, use ion secret update <name> <new-value>")
 	}
 	exists, index := s.checkIfSecretExists(args[len(args)-2], path)
 	if !exists {
-		return errors.New(args[len(args)-2] + " was not found")
+		return errors.New(args[len(args)-2] + " secret was not found")
 	}
 
 	name, value, _, _, err := s.extractArgs(args, false)

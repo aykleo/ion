@@ -15,7 +15,7 @@ type IData interface {
 	SetUsername(name, path string)
 
 	AddSecret(args []string, path string) error
-	UpdateSecret(args []string, path string) error
+	UpdateSecretValue(args []string, path string) error
 }
 
 func (s *Data) GetUser() User {

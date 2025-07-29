@@ -73,7 +73,7 @@ func addSecret(args []string, configPath string, dataRef data.IData) tea.Cmd {
 	}
 }
 
-func updateSecret(args []string, configPath string, dataRef data.IData) tea.Cmd {
+func updateSecretValue(args []string, configPath string, dataRef data.IData) tea.Cmd {
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
@@ -89,7 +89,7 @@ func updateSecret(args []string, configPath string, dataRef data.IData) tea.Cmd 
 		}
 	}
 
-	err := dataRef.UpdateSecret(args, configPath)
+	err := dataRef.UpdateSecretValue(args, configPath)
 	if err != nil {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
@@ -103,7 +103,7 @@ func updateSecret(args []string, configPath string, dataRef data.IData) tea.Cmd 
 	return func() tea.Msg {
 		var b strings.Builder
 		b.WriteString(args[(len(args) - 2)])
-		b.WriteString(" updated")
+		b.WriteString(" updated with a new value")
 		return CommandFinishedMsg{
 			Command: "ion secret update ",
 			Output:  b.String(),

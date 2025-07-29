@@ -83,6 +83,18 @@ func handleCDCommand(fullCommand string) CommandFinishedMsg {
 	}
 }
 
+type IonCommandHandler func(args []string, configPath string, dataRef data.IData) tea.Cmd
+
+var routes = map[string]map[string]IonCommandHandler{
+	"user": {
+		"set": changeUsername,
+	},
+	"secret": {
+		"add":    addSecret,
+		"update": updateSecretValue,
+	},
+}
+
 func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 	configPath := config.GetConfigPath()
 
@@ -109,45 +121,18 @@ func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 	action := args[2]
 	args = args[3:]
 
-	switch category {
-	case "user":
-		switch action {
-		case "set":
-			return changeUsername(args, configPath, dataRef)
-		default:
-			return func() tea.Msg {
-				return CommandFinishedMsg{
-					Err:     errors.New("command not found"),
-					Command: "ion",
-					Output:  "command not found",
-					NewDir:  currentDir,
-				}
-			}
+	if categoryHandlers, categoryExists := routes[category]; categoryExists {
+		if handler, actionExists := categoryHandlers[action]; actionExists {
+			return handler(args, configPath, dataRef)
 		}
-	case "secret":
-		switch action {
-		case "add":
-			return addSecret(args, configPath, dataRef)
-		case "update":
-			return updateSecret(args, configPath, dataRef)
-		default:
-			return func() tea.Msg {
-				return CommandFinishedMsg{
-					Err:     errors.New("command not found"),
-					Command: "ion",
-					Output:  "command not found",
-					NewDir:  currentDir,
-				}
-			}
-		}
-	default:
-		return func() tea.Msg {
-			return CommandFinishedMsg{
-				Command: "ion",
-				Output:  "command not found",
-				NewDir:  currentDir,
-				Err:     errors.New("command not found"),
-			}
+	}
+
+	return func() tea.Msg {
+		return CommandFinishedMsg{
+			Err:     errors.New("command not found, please use ion help"),
+			Command: "ion",
+			Output:  "command not found",
+			NewDir:  currentDir,
 		}
 	}
 }
