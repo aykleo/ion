@@ -292,3 +292,42 @@ func (s *Data) SearchSecret(args []string) ([]Secret, error) {
 
 	return []Secret{s.Secrets[index]}, nil
 }
+
+func (s *Data) RemoveSecret(args []string, path string) error {
+	if len(args) != 1 {
+		return errors.New("invalid arguments, use ion secret remove <name>")
+	}
+
+	secretName := args[len(args)-1]
+	exists, index := s.checkIfSecretExists(secretName)
+	if !exists {
+		return errors.New("secret was not found")
+	}
+
+	dataPath := filepath.Join(path, "data.json")
+
+	var data Data
+	fileData, err := os.ReadFile(dataPath)
+	if err != nil {
+		data = *s
+	} else {
+		if err := json.Unmarshal(fileData, &data); err != nil {
+			return err
+		}
+	}
+
+	data.Secrets = append(data.Secrets[:index], data.Secrets[index+1:]...)
+
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
+		return err
+	}
+
+	*s = data
+	s.removeFromSecretIndex(secretName, index)
+
+	return nil
+}
