@@ -94,6 +94,8 @@ func JoinVertical(strs ...string) string {
 func FormatCommandPrompt(command, username string) string {
 	var b strings.Builder
 	date := time.Now().Format("15:04")
+	commandHeader := strings.Split(command, " ")
+	restOfCommand := strings.Join(commandHeader[1:], " ")
 	b.WriteString(MiscStyle.Render("["))
 	b.WriteString(NoStyle.Render(date))
 	b.WriteString(MiscStyle.Render("]"))
@@ -102,7 +104,9 @@ func FormatCommandPrompt(command, username string) string {
 	b.WriteString(MainTheme.Render(username))
 	b.WriteString(" ")
 	b.WriteString(MainTheme.Render("> "))
-	b.WriteString(NoStyle.Render(command))
+	b.WriteString(MainTheme.Render(commandHeader[0]))
+	b.WriteString(" ")
+	b.WriteString(NoStyle.Render(restOfCommand))
 	return CommandPromptStyle.Render(b.String())
 }
 

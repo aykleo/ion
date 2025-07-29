@@ -35,11 +35,11 @@ func addSecret(args []string, configPath string, dataRef data.IData) tea.Cmd {
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret add accepts two optionals flags and two arguments\n")
-			b.WriteString("          ion secret add <name> <value> \n")
-			b.WriteString("          ion secret add -s <salt> <name> <value> \n")
+			b.WriteString("ion secret add accepts two optionals flags and two arguments\n\n")
+			b.WriteString("          ion secret add <name> <value>\n")
+			b.WriteString("          ion secret add -s <salt> <name> <value>\n")
 			b.WriteString("          ion secret add -t <tag1> <tag2> <name> <value>\n\n")
-			b.WriteString(" if no salt is provided, a random salt will be generated\n\n")
+			b.WriteString(" if no salt is not provided, a random salt will be generated\n")
 			b.WriteString(" if no tags are provided, the secret will not have any tags\n\n")
 			b.WriteString(" example: ion secret add -s mysalt -t tag1 tag2 name value")
 			return CommandFinishedMsg{
@@ -78,8 +78,8 @@ func updateSecretValue(args []string, configPath string, dataRef data.IData) tea
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret update accepts two arguments\n")
-			b.WriteString("          ion secret update <name> <new-value> \n")
+			b.WriteString("ion secret update accepts two arguments\n\n")
+			b.WriteString("          ion secret update <name> <new-value> \n\n")
 			b.WriteString(" example: ion secret update cool-name cool-value")
 			return CommandFinishedMsg{
 				Err:     errors.New("ion secret update error"),
@@ -118,8 +118,8 @@ func updateSecretName(args []string, configPath string, dataRef data.IData) tea.
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret rename accepts two arguments\n")
-			b.WriteString("          ion secret rename <name> <new-name> \n")
+			b.WriteString("ion secret rename accepts two arguments\n\n")
+			b.WriteString("          ion secret rename <name> <new-name> \n\n")
 			b.WriteString(" example: ion secret rename name cooler-name")
 			return CommandFinishedMsg{
 				Err:     errors.New("ion secret update error"),
@@ -159,8 +159,8 @@ func updateSecretTags(args []string, configPath string, dataRef data.IData) tea.
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret tag accepts many arguments but the the last one should always be the name of the secret\n")
-			b.WriteString("          ion secret tag <tag1> <tag2> <name> \n")
+			b.WriteString("ion secret tag accepts many arguments but the the last one should always be the name of the secret\n\n")
+			b.WriteString("          ion secret tag <tag1> <tag2> <name> \n\n")
 			b.WriteString(" example: ion secret tag tag1 tag2 name")
 			return CommandFinishedMsg{
 				Err:     errors.New("ion secret tag error"),
