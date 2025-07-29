@@ -106,3 +106,55 @@ func (s *Data) UpdateSecretValue(args []string, path string) error {
 
 	return nil
 }
+
+func (s *Data) UpdateSecretName(args []string, path string) error {
+	if len(args) != 2 {
+		return errors.New("invalid arguments, use ion secret rename <name> <new-name>")
+	}
+	exists, index := s.checkIfSecretExists(args[len(args)-2], path)
+	if !exists {
+		return errors.New(args[len(args)-2] + " secret was not found")
+	}
+
+	_, value, _, _, err := s.extractArgs(args, false)
+	if err != nil {
+		return err
+	}
+
+	dataPath := filepath.Join(path, "data.json")
+
+	var data Data
+	fileData, err := os.ReadFile(dataPath)
+	if err != nil {
+		data = *s
+	} else {
+		if err := json.Unmarshal(fileData, &data); err != nil {
+			return err
+		}
+	}
+
+	currentTags := data.Secrets[index].Tags
+	currentSalt := data.Secrets[index].Salt
+	currentValue := data.Secrets[index].Value
+
+	data.Secrets[index] = Secret{
+		ID:        value,
+		Salt:      currentSalt,
+		Value:     currentValue,
+		Tags:      currentTags,
+		CreatedAt: data.Secrets[index].CreatedAt,
+		UpdatedAt: time.Now(),
+	}
+
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
+		return err
+	}
+
+	*s = data
+
+	return nil
+}

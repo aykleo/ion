@@ -102,10 +102,52 @@ func updateSecretValue(args []string, configPath string, dataRef data.IData) tea
 	}
 	return func() tea.Msg {
 		var b strings.Builder
+		b.WriteString("secret ")
 		b.WriteString(args[(len(args) - 2)])
 		b.WriteString(" updated with a new value")
 		return CommandFinishedMsg{
 			Command: "ion secret update ",
+			Output:  b.String(),
+			NewDir:  currentDir,
+		}
+	}
+}
+
+func updateSecretName(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	if len(args) < 2 {
+		return func() tea.Msg {
+			var b strings.Builder
+			b.WriteString("ion secret rename accepts two arguments\n\n")
+			b.WriteString("          ion secret rename <name> <new-name> \n")
+			b.WriteString(" example: ion secret rename name cooler-name")
+			return CommandFinishedMsg{
+				Err:     errors.New("ion secret update error"),
+				Command: strings.Join(args, " "),
+				Output:  b.String(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+
+	err := dataRef.UpdateSecretName(args, configPath)
+	if err != nil {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     err,
+				Command: strings.Join(args, " "),
+				Output:  err.Error(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	return func() tea.Msg {
+		var b strings.Builder
+		b.WriteString("secret ")
+		b.WriteString(args[(len(args) - 2)])
+		b.WriteString(" renamed to ")
+		b.WriteString(args[(len(args) - 1)])
+		return CommandFinishedMsg{
+			Command: "ion secret rename ",
 			Output:  b.String(),
 			NewDir:  currentDir,
 		}
