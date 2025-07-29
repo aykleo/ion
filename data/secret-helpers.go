@@ -193,18 +193,9 @@ func extractNameAndValue(args []string) (string, string, error) {
 	}
 
 	return remaining[0], remaining[1], nil
+
 }
 
-// func detectKeepValue(args []string) (bool, int) {
-// 	for i, arg := range args {
-// 		if arg == "-k" || arg == "--keep-value" {
-// 			return true, i
-// 		}
-// 	}
-// 	return false, -1
-// }
-
-// func detectName(args []string) (bool, int) {
 // 	for i, arg := range args {
 // 		if arg == "-n" || arg == "--name" {
 // 			return true, i

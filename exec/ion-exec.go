@@ -12,12 +12,13 @@ type IonCommandHandler func(args []string, configPath string, dataRef data.IData
 
 var routes = map[string]map[string]IonCommandHandler{
 	"user": {
-		"set": changeUsername,
+		"rename": changeUsername,
 	},
 	"secret": {
 		"add":    addSecret,
 		"update": updateSecretValue,
 		"rename": updateSecretName,
+		"tags":   updateSecretTags,
 	},
 }
 

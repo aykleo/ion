@@ -12,19 +12,20 @@ func changeUsername(args []string, configPath string, dataRef data.IData) tea.Cm
 	if len(args) != 1 {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
-				Err:     errors.New("ion user set <username>"),
+				Err:     errors.New("ion user rename <username>"),
 				Command: strings.Join(args, " "),
-				Output:  "ion user needs one argument, try [ ion user set <username> ]",
+				Output:  "ion user needs one argument, try [ ion user rename <username> ]",
 				NewDir:  currentDir,
 			}
 		}
 	}
 	username := args[0]
+	currentUsername := dataRef.GetUser().Username
 	dataRef.SetUsername(username, configPath)
 	return func() tea.Msg {
 		return CommandFinishedMsg{
-			Command: "ion user set " + username,
-			Output:  "username set to " + username,
+			Command: "ion user rename " + username,
+			Output:  "username " + currentUsername + " renamed to " + username,
 			NewDir:  currentDir,
 		}
 	}
@@ -34,7 +35,7 @@ func addSecret(args []string, configPath string, dataRef data.IData) tea.Cmd {
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret add accepts two optionals flags and two arguments\n\n")
+			b.WriteString("ion secret add accepts two optionals flags and two arguments\n")
 			b.WriteString("          ion secret add <name> <value> \n")
 			b.WriteString("          ion secret add -s <salt> <name> <value> \n")
 			b.WriteString("          ion secret add -t <tag1> <tag2> <name> <value>\n\n")
@@ -77,7 +78,7 @@ func updateSecretValue(args []string, configPath string, dataRef data.IData) tea
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret update accepts two arguments\n\n")
+			b.WriteString("ion secret update accepts two arguments\n")
 			b.WriteString("          ion secret update <name> <new-value> \n")
 			b.WriteString(" example: ion secret update cool-name cool-value")
 			return CommandFinishedMsg{
@@ -106,7 +107,7 @@ func updateSecretValue(args []string, configPath string, dataRef data.IData) tea
 		b.WriteString(args[(len(args) - 2)])
 		b.WriteString(" updated with a new value")
 		return CommandFinishedMsg{
-			Command: "ion secret update ",
+			Command: "ion secret update",
 			Output:  b.String(),
 			NewDir:  currentDir,
 		}
@@ -117,7 +118,7 @@ func updateSecretName(args []string, configPath string, dataRef data.IData) tea.
 	if len(args) < 2 {
 		return func() tea.Msg {
 			var b strings.Builder
-			b.WriteString("ion secret rename accepts two arguments\n\n")
+			b.WriteString("ion secret rename accepts two arguments\n")
 			b.WriteString("          ion secret rename <name> <new-name> \n")
 			b.WriteString(" example: ion secret rename name cooler-name")
 			return CommandFinishedMsg{
@@ -147,7 +148,46 @@ func updateSecretName(args []string, configPath string, dataRef data.IData) tea.
 		b.WriteString(" renamed to ")
 		b.WriteString(args[(len(args) - 1)])
 		return CommandFinishedMsg{
-			Command: "ion secret rename ",
+			Command: "ion secret rename",
+			Output:  b.String(),
+			NewDir:  currentDir,
+		}
+	}
+}
+
+func updateSecretTags(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	if len(args) < 2 {
+		return func() tea.Msg {
+			var b strings.Builder
+			b.WriteString("ion secret tag accepts many arguments but the the last one should always be the name of the secret\n")
+			b.WriteString("          ion secret tag <tag1> <tag2> <name> \n")
+			b.WriteString(" example: ion secret tag tag1 tag2 name")
+			return CommandFinishedMsg{
+				Err:     errors.New("ion secret tag error"),
+				Command: strings.Join(args, " "),
+				Output:  b.String(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	err := dataRef.UpdateSecretTags(args, configPath)
+	if err != nil {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     err,
+				Command: strings.Join(args, " "),
+				Output:  err.Error(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	return func() tea.Msg {
+		var b strings.Builder
+		b.WriteString("tags for secret ")
+		b.WriteString(args[(len(args) - 1)])
+		b.WriteString(" updated")
+		return CommandFinishedMsg{
+			Command: "ion secret tags",
 			Output:  b.String(),
 			NewDir:  currentDir,
 		}

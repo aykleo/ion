@@ -5,6 +5,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -60,9 +61,14 @@ func (s *Data) UpdateSecretValue(args []string, path string) error {
 	if len(args) != 2 {
 		return errors.New("invalid arguments, use ion secret update <name> <new-value>")
 	}
-	exists, index := s.checkIfSecretExists(args[len(args)-2], path)
+	var b strings.Builder
+	secretName := args[len(args)-2]
+	b.WriteString("secret ")
+	b.WriteString(secretName)
+	b.WriteString(" was not found")
+	exists, index := s.checkIfSecretExists(secretName, path)
 	if !exists {
-		return errors.New(args[len(args)-2] + " secret was not found")
+		return errors.New(b.String())
 	}
 
 	name, value, _, _, err := s.extractArgs(args, false)
@@ -111,9 +117,14 @@ func (s *Data) UpdateSecretName(args []string, path string) error {
 	if len(args) != 2 {
 		return errors.New("invalid arguments, use ion secret rename <name> <new-name>")
 	}
-	exists, index := s.checkIfSecretExists(args[len(args)-2], path)
+	var b strings.Builder
+	secretName := args[len(args)-2]
+	b.WriteString("secret ")
+	b.WriteString(secretName)
+	b.WriteString(" was not found")
+	exists, index := s.checkIfSecretExists(secretName, path)
 	if !exists {
-		return errors.New(args[len(args)-2] + " secret was not found")
+		return errors.New(b.String())
 	}
 
 	_, value, _, _, err := s.extractArgs(args, false)
@@ -142,6 +153,63 @@ func (s *Data) UpdateSecretName(args []string, path string) error {
 		Salt:      currentSalt,
 		Value:     currentValue,
 		Tags:      currentTags,
+		CreatedAt: data.Secrets[index].CreatedAt,
+		UpdatedAt: time.Now(),
+	}
+
+	jsonData, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
+		return err
+	}
+
+	*s = data
+
+	return nil
+}
+
+func (s *Data) UpdateSecretTags(args []string, path string) error {
+	if len(args) < 2 {
+		return errors.New("invalid arguments, use ion secret tag <tag1> <tag2> <name>")
+	}
+	var b strings.Builder
+	secretName := args[len(args)-1]
+	b.WriteString("secret ")
+	b.WriteString(secretName)
+	b.WriteString(" was not found")
+	exists, index := s.checkIfSecretExists(secretName, path)
+	if !exists {
+		return errors.New(b.String())
+	}
+
+	tagArgs := args[:len(args)-1]
+	for i, tag := range tagArgs {
+		tagArgs[i] = strings.ToUpper(tag)
+	}
+
+	dataPath := filepath.Join(path, "data.json")
+
+	var data Data
+	fileData, err := os.ReadFile(dataPath)
+	if err != nil {
+		data = *s
+	} else {
+		if err := json.Unmarshal(fileData, &data); err != nil {
+			return err
+		}
+	}
+
+	currentSalt := data.Secrets[index].Salt
+	currentValue := data.Secrets[index].Value
+	currentName := data.Secrets[index].ID
+
+	data.Secrets[index] = Secret{
+		ID:        currentName,
+		Salt:      currentSalt,
+		Value:     currentValue,
+		Tags:      tagArgs,
 		CreatedAt: data.Secrets[index].CreatedAt,
 		UpdatedAt: time.Now(),
 	}
