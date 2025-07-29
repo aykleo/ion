@@ -6,16 +6,65 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	mathrand "math/rand"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
+
+func (s *Data) buildSecretIndex() {
+	if s.secretIndex == nil {
+		s.secretIndex = make(map[string]int)
+	} else {
+		for k := range s.secretIndex {
+			delete(s.secretIndex, k)
+		}
+	}
+
+	for i, secret := range s.Secrets {
+		s.secretIndex[secret.ID] = i
+	}
+}
+
+func (s *Data) ensureSecretIndex() {
+	if s.secretIndex == nil || len(s.secretIndex) != len(s.Secrets) {
+		s.buildSecretIndex()
+	}
+}
+
+func (s *Data) addToSecretIndex(secretID string, index int) {
+	if s.secretIndex == nil {
+		s.secretIndex = make(map[string]int)
+	}
+	s.secretIndex[secretID] = index
+}
+
+func (s *Data) removeFromSecretIndex(secretID string, removedIndex int) {
+	if s.secretIndex == nil {
+		return
+	}
+
+	delete(s.secretIndex, secretID)
+
+	for id, idx := range s.secretIndex {
+		if idx > removedIndex {
+			s.secretIndex[id] = idx - 1
+		}
+	}
+}
+
+func (s *Data) updateSecretIndex(oldID, newID string, index int) {
+	if s.secretIndex == nil {
+		s.secretIndex = make(map[string]int)
+	}
+
+	delete(s.secretIndex, oldID)
+	s.secretIndex[newID] = index
+}
 
 func (s *Data) extractArgs(args []string, generateSaltIfMissing bool) (string, string, string, []string, error) {
 	name, value, err := extractNameAndValue(args)
@@ -98,23 +147,36 @@ func decrypt(salt string, encryptedValue string) string {
 	return string(plaintext)
 }
 
-func (s *Data) checkIfSecretExists(name string, path string) (bool, int) {
-	dataPath := filepath.Join(path, "data.json")
-	fileData, err := os.ReadFile(dataPath)
-	if err != nil {
-		return false, -1
-	}
-	var data Data
-	if err := json.Unmarshal(fileData, &data); err != nil {
-		return false, -1
-	}
+func (s *Data) checkIfSecretExists(name string) (bool, int) {
+	s.ensureSecretIndex()
 
-	for i, secret := range data.Secrets {
-		if secret.ID == name {
-			return true, i
-		}
+	if index, exists := s.secretIndex[name]; exists {
+		return true, index
 	}
 	return false, -1
+}
+
+func (s *Data) fuzzySearchSecret(name string) (int, error) {
+	if len(s.Secrets) == 0 {
+		return -1, errors.New("secret was not found")
+	}
+
+	idToIndex := make(map[string]int, len(s.Secrets))
+	secretIds := make([]string, len(s.Secrets))
+
+	for i, secret := range s.Secrets {
+		secretIds[i] = secret.ID
+		idToIndex[secret.ID] = i
+	}
+
+	results := fuzzy.RankFind(name, secretIds)
+
+	if len(results) == 0 {
+		return -1, errors.New("secret was not found")
+	}
+
+	bestMatch := results[0].Target
+	return idToIndex[bestMatch], nil
 }
 
 func detectSalt(args []string) (bool, string) {
@@ -195,11 +257,3 @@ func extractNameAndValue(args []string) (string, string, error) {
 	return remaining[0], remaining[1], nil
 
 }
-
-// 	for i, arg := range args {
-// 		if arg == "-n" || arg == "--name" {
-// 			return true, i
-// 		}
-// 	}
-// 	return false, -1
-// }

@@ -14,7 +14,7 @@ func (s *Data) AddSecret(args []string, path string) error {
 		return errors.New("invalid arguments, use ion secret add <name> <value> with optional -s <salt> and -t <tag1> <tag2>")
 	}
 
-	exists, _ := s.checkIfSecretExists(args[len(args)-2], path)
+	exists, _ := s.checkIfSecretExists(args[len(args)-2])
 	if exists {
 		return errors.New("secret already exists, use ion secret update <name> <new-value> to change it")
 	}
@@ -46,6 +46,7 @@ func (s *Data) AddSecret(args []string, path string) error {
 	})
 
 	s.Secrets = data.Secrets
+	s.addToSecretIndex(name, len(s.Secrets)-1)
 
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
@@ -66,7 +67,7 @@ func (s *Data) UpdateSecretValue(args []string, path string) error {
 	b.WriteString("secret ")
 	b.WriteString(secretName)
 	b.WriteString(" was not found")
-	exists, index := s.checkIfSecretExists(secretName, path)
+	exists, index := s.checkIfSecretExists(secretName)
 	if !exists {
 		return errors.New(b.String())
 	}
@@ -109,6 +110,7 @@ func (s *Data) UpdateSecretValue(args []string, path string) error {
 	}
 
 	*s = data
+	s.ensureSecretIndex()
 
 	return nil
 }
@@ -122,7 +124,7 @@ func (s *Data) UpdateSecretName(args []string, path string) error {
 	b.WriteString("secret ")
 	b.WriteString(secretName)
 	b.WriteString(" was not found")
-	exists, index := s.checkIfSecretExists(secretName, path)
+	exists, index := s.checkIfSecretExists(secretName)
 	if !exists {
 		return errors.New(b.String())
 	}
@@ -166,6 +168,7 @@ func (s *Data) UpdateSecretName(args []string, path string) error {
 	}
 
 	*s = data
+	s.updateSecretIndex(secretName, value, index)
 
 	return nil
 }
@@ -179,7 +182,7 @@ func (s *Data) UpdateSecretTags(args []string, path string) error {
 	b.WriteString("secret ")
 	b.WriteString(secretName)
 	b.WriteString(" was not found")
-	exists, index := s.checkIfSecretExists(secretName, path)
+	exists, index := s.checkIfSecretExists(secretName)
 	if !exists {
 		return errors.New(b.String())
 	}
@@ -223,6 +226,7 @@ func (s *Data) UpdateSecretTags(args []string, path string) error {
 	}
 
 	*s = data
+	s.ensureSecretIndex()
 
 	return nil
 }
@@ -272,4 +276,19 @@ func (s *Data) ListSecrets(args []string, path string) ([]Secret, bool, error) {
 	}
 
 	return secrets, hasJSON, nil
+}
+
+func (s *Data) SearchSecret(args []string, path string) ([]Secret, error) {
+	if len(args) != 1 {
+		return nil, errors.New("invalid arguments, use ion secret search <name>")
+	}
+
+	secretName := args[len(args)-1]
+
+	index, err := s.fuzzySearchSecret(secretName)
+	if err != nil {
+		return nil, err
+	}
+
+	return []Secret{s.Secrets[index]}, nil
 }

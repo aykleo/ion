@@ -5,9 +5,10 @@ import (
 )
 
 type Data struct {
-	User    User
-	Secrets []Secret
-	Aliases []Alias
+	User        User
+	Secrets     []Secret
+	Aliases     []Alias
+	secretIndex map[string]int
 }
 
 type Secret struct {

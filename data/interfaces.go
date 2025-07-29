@@ -19,6 +19,7 @@ type IData interface {
 	UpdateSecretName(args []string, path string) error
 	UpdateSecretTags(args []string, path string) error
 	ListSecrets(args []string, path string) ([]Secret, bool, error)
+	SearchSecret(args []string, path string) ([]Secret, error)
 }
 
 func (s *Data) GetUser() User {

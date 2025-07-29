@@ -259,3 +259,24 @@ func listSecrets(args []string, configPath string, dataRef data.IData) tea.Cmd {
 		}
 	}
 }
+
+func searchSecret(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	secret, err := dataRef.SearchSecret(args, configPath)
+	if err != nil {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     err,
+				Command: strings.Join(args, " "),
+				Output:  err.Error(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	return func() tea.Msg {
+		return CommandFinishedMsg{
+			Command: "ion secret search",
+			Output:  styles.FormatSecretsAsJSON(secret),
+			NewDir:  currentDir,
+		}
+	}
+}
