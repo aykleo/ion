@@ -226,3 +226,50 @@ func (s *Data) UpdateSecretTags(args []string, path string) error {
 
 	return nil
 }
+
+func (s *Data) ListSecrets(args []string, path string) ([]Secret, bool, error) {
+	if len(args) == 0 {
+		return s.Secrets, false, nil
+	}
+
+	var b strings.Builder
+	b.WriteString("ion secret list accepts two optionals flags, -d and -j\n\n")
+	b.WriteString(" -d or --decrypt: decrypt the secrets showing their real values\n")
+	b.WriteString(" -j or --json: show the secrets in json format\n\n")
+	b.WriteString(" example: ion secret list -j -d\n")
+
+	if len(args) > 2 {
+		return nil, false, errors.New(b.String())
+	}
+
+	var hasDecrypt, hasJSON bool
+
+	for _, arg := range args {
+		switch arg {
+		case "-d", "--decrypt":
+			hasDecrypt = true
+		case "-j", "--json":
+			hasJSON = true
+		default:
+			return nil, false, errors.New(b.String())
+		}
+	}
+
+	secrets := s.Secrets
+	if hasDecrypt {
+		decryptedSecrets := []Secret{}
+		for _, secret := range s.Secrets {
+			decryptedSecrets = append(decryptedSecrets, Secret{
+				ID:        secret.ID,
+				Salt:      secret.Salt,
+				Value:     decrypt(secret.Salt, secret.Value),
+				Tags:      secret.Tags,
+				CreatedAt: secret.CreatedAt,
+				UpdatedAt: secret.UpdatedAt,
+			})
+		}
+		secrets = decryptedSecrets
+	}
+
+	return secrets, hasJSON, nil
+}

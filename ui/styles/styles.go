@@ -124,6 +124,10 @@ func FormatCommandOutput(output string) string {
 		return formatTable(trimmedOutput)
 	}
 
+	if isJsonOutput(trimmedOutput) {
+		return formatJsonOutput(trimmedOutput)
+	}
+
 	return FormatSuccessMessage(trimmedOutput)
 }
 

@@ -19,6 +19,7 @@ var routes = map[string]map[string]IonCommandHandler{
 		"update": updateSecretValue,
 		"rename": updateSecretName,
 		"tags":   updateSecretTags,
+		"list":   listSecrets,
 	},
 }
 

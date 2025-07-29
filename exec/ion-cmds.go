@@ -2,9 +2,11 @@ package exec
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/aykleo/ion/data"
+	"github.com/aykleo/ion/ui/styles"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -188,6 +190,70 @@ func updateSecretTags(args []string, configPath string, dataRef data.IData) tea.
 		b.WriteString(" updated")
 		return CommandFinishedMsg{
 			Command: "ion secret tags",
+			Output:  b.String(),
+			NewDir:  currentDir,
+		}
+	}
+}
+
+func listSecrets(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	secrets, isJson, err := dataRef.ListSecrets(args, configPath)
+	if err != nil {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     err,
+				Command: strings.Join(args, " "),
+				Output:  err.Error(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	if isJson {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Command: "ion secret list",
+				Output:  styles.FormatSecretsAsJSON(secrets),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	return func() tea.Msg {
+		var b strings.Builder
+		b.WriteString("Name             Value         Salt         Tags                    Updated\n")
+		b.WriteString("----             -----         ----         ----                    -------\n")
+		for _, secret := range secrets {
+			name := secret.ID
+			if len(name) > 15 {
+				name = name[:12] + "..."
+			}
+			b.WriteString(fmt.Sprintf("%-17s", name))
+
+			value := secret.Value
+			if len(value) > 10 {
+				value = value[:10] + "..."
+			}
+			b.WriteString(fmt.Sprintf("%-14s", value))
+
+			salt := secret.Salt
+			if len(salt) > 12 {
+				salt = salt[:9] + "..."
+			}
+			b.WriteString(fmt.Sprintf("%-13s", salt))
+
+			tags := strings.Join(secret.Tags, ",")
+			if len(tags) > 20 {
+				tags = tags[:17] + "..."
+			}
+			b.WriteString(fmt.Sprintf("%-23s", tags))
+
+			updatedAt := secret.UpdatedAt.Format("2006-01-02")
+			b.WriteString(updatedAt)
+
+			b.WriteString("\n")
+		}
+
+		return CommandFinishedMsg{
+			Command: "ion secret list",
 			Output:  b.String(),
 			NewDir:  currentDir,
 		}
