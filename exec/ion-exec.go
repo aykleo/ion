@@ -22,6 +22,7 @@ var routes = map[string]map[string]IonCommandHandler{
 		"list":   listSecrets,
 		"search": searchSecret,
 		"remove": removeSecret,
+		"use":    copySecretToClipboard,
 	},
 }
 

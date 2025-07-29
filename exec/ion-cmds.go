@@ -305,3 +305,28 @@ func removeSecret(args []string, configPath string, dataRef data.IData) tea.Cmd 
 		}
 	}
 }
+
+func copySecretToClipboard(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	err := dataRef.CopySecretToClipboard(args, configPath)
+	if err != nil {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     err,
+				Command: strings.Join(args, " "),
+				Output:  err.Error(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	return func() tea.Msg {
+		var b strings.Builder
+		b.WriteString("secret ")
+		b.WriteString(args[(len(args) - 1)])
+		b.WriteString(" copied to clipboard")
+		return CommandFinishedMsg{
+			Command: "ion secret copy",
+			Output:  b.String(),
+			NewDir:  currentDir,
+		}
+	}
+}

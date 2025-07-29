@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/atotto/clipboard"
 )
 
 func (s *Data) AddSecret(args []string, path string) error {
@@ -328,6 +330,24 @@ func (s *Data) RemoveSecret(args []string, path string) error {
 
 	*s = data
 	s.removeFromSecretIndex(secretName, index)
+
+	return nil
+}
+
+func (s *Data) CopySecretToClipboard(args []string, path string) error {
+	if len(args) != 1 {
+		return errors.New("invalid arguments, use ion secret copy <name>")
+	}
+
+	secretName := args[len(args)-1]
+	exists, index := s.checkIfSecretExists(secretName)
+	if !exists {
+		return errors.New("secret was not found")
+	}
+
+	secret := s.Secrets[index]
+	decryptedValue := decrypt(secret.Salt, secret.Value)
+	clipboard.WriteAll(decryptedValue)
 
 	return nil
 }

@@ -21,6 +21,7 @@ type IData interface {
 	ListSecrets(args []string, path string) ([]Secret, bool, error)
 	SearchSecret(args []string) ([]Secret, error)
 	RemoveSecret(args []string, path string) error
+	CopySecretToClipboard(args []string, path string) error
 }
 
 func (s *Data) GetUser() User {
