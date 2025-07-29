@@ -8,14 +8,15 @@ import (
 )
 
 const (
-	MainThemeColor   = "135"
+	MainThemeColor   = "123"
 	FolderColor      = "2"
-	SuccessColor     = "2"
-	ErrorColor       = "1"
+	SuccessColor     = "42"
+	ErrorColor       = "203"
 	CommandColor     = "4"
 	OutputColor      = "7"
 	TableHeaderColor = "6"
 	TableBorderColor = "8"
+	MiscColor        = "212"
 )
 
 var (
@@ -24,6 +25,7 @@ var (
 	FolderStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color(FolderColor)).Bold(false).Padding(1).Background(lipgloss.Color(MainThemeColor))
 	TerminalStyle = lipgloss.NewStyle().Padding(1, 2)
 	NoStyle       = lipgloss.NewStyle()
+	MiscStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color(MiscColor))
 )
 
 var (
@@ -91,14 +93,20 @@ func JoinVertical(strs ...string) string {
 
 func FormatCommandPrompt(command, username string) string {
 	var b strings.Builder
-	date := time.Now().Format("2006-01-02 15:04:05")
-	b.WriteString(MainTheme.Render(date))
-	b.WriteString(MainTheme.Render(" "))
+	date := time.Now().Format("15:04")
+	commandHeader := strings.Split(command, " ")
+	restOfCommand := strings.Join(commandHeader[1:], " ")
+	b.WriteString(MiscStyle.Render("["))
+	b.WriteString(NoStyle.Render(date))
+	b.WriteString(MiscStyle.Render("]"))
+	b.WriteString(" ")
 	b.WriteString(MainTheme.Render("~/"))
 	b.WriteString(MainTheme.Render(username))
-	b.WriteString(MainTheme.Render(" "))
+	b.WriteString(" ")
 	b.WriteString(MainTheme.Render("> "))
-	b.WriteString(MainTheme.Render(command))
+	b.WriteString(MainTheme.Render(commandHeader[0]))
+	b.WriteString(" ")
+	b.WriteString(NoStyle.Render(restOfCommand))
 	return CommandPromptStyle.Render(b.String())
 }
 
@@ -116,7 +124,11 @@ func FormatCommandOutput(output string) string {
 		return formatTable(trimmedOutput)
 	}
 
-	return CommandOutputStyle.Render(trimmedOutput)
+	if isJsonOutput(trimmedOutput) {
+		return formatJsonOutput(trimmedOutput)
+	}
+
+	return FormatSuccessMessage(trimmedOutput)
 }
 
 func FormatSuccessMessage(message string) string {

@@ -33,7 +33,6 @@ func ExecSysCommand(command string, args []string) tea.Cmd {
 		}
 	}
 }
-
 func handleCDCommand(fullCommand string) CommandFinishedMsg {
 	parts := strings.Fields(fullCommand)
 	if len(parts) < 2 {

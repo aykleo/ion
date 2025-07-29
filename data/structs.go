@@ -1,17 +1,19 @@
-package storage
+package data
 
 import (
 	"time"
 )
 
-type Storage struct {
-	User      User
-	Passwords []Password
-	Aliases   []Alias
+type Data struct {
+	User        User
+	Secrets     []Secret
+	Aliases     []Alias
+	secretIndex map[string]int
 }
 
-type Password struct {
+type Secret struct {
 	ID        string
+	Salt      string
 	Value     string
 	Tags      []string
 	CreatedAt time.Time

@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/aykleo/ion/config"
-	"github.com/aykleo/ion/storage"
+	"github.com/aykleo/ion/data"
 	pager "github.com/aykleo/ion/ui/pager"
 	textinput "github.com/aykleo/ion/ui/text-input"
 )
@@ -15,7 +15,7 @@ type terminal struct {
 	err           error
 	currentFolder string
 	config        config.IConfig
-	storage       storage.IStorage
+	data          data.IData
 	input         textinput.ITextInput
 	pager         pager.IPager
 }

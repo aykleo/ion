@@ -54,9 +54,20 @@ func (m *Input) doCommand(msg string) (tea.Cmd, error) {
 	defer m.input.Reset()
 	isIonCommand := strings.HasPrefix(msg, "ion")
 
+	parts := strings.Fields(msg)
+	var args []string
+
+	if len(parts) > 1 {
+		args = parts[1:]
+	}
+
+	if isIonCommand {
+		args = parts
+	}
+
 	command := CommandMsg{
 		Command:      msg,
-		Args:         []string{},
+		Args:         args,
 		IsIonCommand: isIonCommand,
 	}
 
