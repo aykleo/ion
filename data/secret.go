@@ -278,7 +278,7 @@ func (s *Data) ListSecrets(args []string, path string) ([]Secret, bool, error) {
 	return secrets, hasJSON, nil
 }
 
-func (s *Data) SearchSecret(args []string, path string) ([]Secret, error) {
+func (s *Data) SearchSecret(args []string) ([]Secret, error) {
 	if len(args) != 1 {
 		return nil, errors.New("invalid arguments, use ion secret search <name>")
 	}

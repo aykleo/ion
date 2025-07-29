@@ -261,7 +261,7 @@ func listSecrets(args []string, configPath string, dataRef data.IData) tea.Cmd {
 }
 
 func searchSecret(args []string, configPath string, dataRef data.IData) tea.Cmd {
-	secret, err := dataRef.SearchSecret(args, configPath)
+	secret, err := dataRef.SearchSecret(args)
 	if err != nil {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
