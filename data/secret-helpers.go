@@ -26,7 +26,7 @@ func (s *Data) buildSecretIndex() {
 	}
 
 	for i, secret := range s.Secrets {
-		s.secretIndex[secret.ID] = i
+		s.secretIndex[secret.Name] = i
 	}
 }
 
@@ -36,34 +36,34 @@ func (s *Data) ensureSecretIndex() {
 	}
 }
 
-func (s *Data) addToSecretIndex(secretID string, index int) {
+func (s *Data) addToSecretIndex(secretName string, index int) {
 	if s.secretIndex == nil {
 		s.secretIndex = make(map[string]int)
 	}
-	s.secretIndex[secretID] = index
+	s.secretIndex[secretName] = index
 }
 
-func (s *Data) removeFromSecretIndex(secretID string, removedIndex int) {
+func (s *Data) removeFromSecretIndex(secretName string, removedIndex int) {
 	if s.secretIndex == nil {
 		return
 	}
 
-	delete(s.secretIndex, secretID)
+	delete(s.secretIndex, secretName)
 
-	for id, idx := range s.secretIndex {
+	for name, idx := range s.secretIndex {
 		if idx > removedIndex {
-			s.secretIndex[id] = idx - 1
+			s.secretIndex[name] = idx - 1
 		}
 	}
 }
 
-func (s *Data) updateSecretIndex(oldID, newID string, index int) {
+func (s *Data) updateSecretIndex(oldName, newName string, index int) {
 	if s.secretIndex == nil {
 		s.secretIndex = make(map[string]int)
 	}
 
-	delete(s.secretIndex, oldID)
-	s.secretIndex[newID] = index
+	delete(s.secretIndex, oldName)
+	s.secretIndex[newName] = index
 }
 
 func (s *Data) extractArgs(args []string, generateSaltIfMissing bool) (string, string, string, []string, error) {
@@ -165,8 +165,8 @@ func (s *Data) fuzzySearchSecret(name string) (int, error) {
 	secretIds := make([]string, len(s.Secrets))
 
 	for i, secret := range s.Secrets {
-		secretIds[i] = secret.ID
-		idToIndex[secret.ID] = i
+		secretIds[i] = secret.Name
+		idToIndex[secret.Name] = i
 	}
 
 	results := fuzzy.RankFind(name, secretIds)

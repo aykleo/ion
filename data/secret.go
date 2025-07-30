@@ -29,7 +29,8 @@ func (s *Data) AddSecret(args []string, path string) error {
 	}
 
 	sqliteSecret := sqlite.Secret{
-		ID:        name,
+		ID:        sqlite.GenerateUUID(),
+		Name:      name,
 		Salt:      salt,
 		Value:     encrypt(salt, value),
 		Tags:      tgs,
@@ -43,6 +44,7 @@ func (s *Data) AddSecret(args []string, path string) error {
 
 	dataSecret := Secret{
 		ID:        sqliteSecret.ID,
+		Name:      sqliteSecret.Name,
 		Salt:      sqliteSecret.Salt,
 		Value:     sqliteSecret.Value,
 		Tags:      sqliteSecret.Tags,
@@ -82,7 +84,7 @@ func (s *Data) UpdateSecretValue(args []string, path string) error {
 	currentSalt := s.Secrets[index].Salt
 	encryptedValue := encrypt(currentSalt, value)
 
-	if err := sqlite.UpdateSecretValue(s.db, name, encryptedValue); err != nil {
+	if err := sqlite.UpdateSecretValueByName(s.db, name, encryptedValue); err != nil {
 		return err
 	}
 
@@ -125,7 +127,7 @@ func (s *Data) UpdateSecretName(args []string, path string) error {
 
 	s.ensureSecretIndex()
 	if index, exists := s.secretIndex[secretName]; exists {
-		s.Secrets[index].ID = newName
+		s.Secrets[index].Name = newName
 		s.Secrets[index].UpdatedAt = time.Now()
 		s.updateSecretIndex(secretName, newName, index)
 	}
@@ -211,7 +213,7 @@ func (s *Data) ListSecrets(args []string, path string) ([]Secret, bool, error) {
 		decryptedSecrets := []Secret{}
 		for _, secret := range s.Secrets {
 			decryptedSecrets = append(decryptedSecrets, Secret{
-				ID:        secret.ID,
+				Name:      secret.Name,
 				Salt:      secret.Salt,
 				Value:     decrypt(secret.Salt, secret.Value),
 				Tags:      secret.Tags,
@@ -263,7 +265,7 @@ func (s *Data) RemoveSecret(args []string, path string) error {
 		return errors.New("secret was not found")
 	}
 
-	if err := sqlite.RemoveSecret(s.db, secretName); err != nil {
+	if err := sqlite.RemoveSecretByName(s.db, secretName); err != nil {
 		return err
 	}
 

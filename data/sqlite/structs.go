@@ -8,6 +8,7 @@ type User struct {
 
 type Secret struct {
 	ID        string
+	Name      string
 	Salt      string
 	Value     string
 	Tags      []string
@@ -17,6 +18,7 @@ type Secret struct {
 
 type Alias struct {
 	ID        string
+	Name      string
 	Value     string
 	CreatedAt time.Time
 	UpdatedAt time.Time

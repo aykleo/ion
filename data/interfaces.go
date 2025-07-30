@@ -66,6 +66,7 @@ func (s *Data) loadDataFromDB() error {
 	for i, sqliteSecret := range sqliteSecrets {
 		s.Secrets[i] = Secret{
 			ID:        sqliteSecret.ID,
+			Name:      sqliteSecret.Name,
 			Salt:      sqliteSecret.Salt,
 			Value:     sqliteSecret.Value,
 			Tags:      sqliteSecret.Tags,
@@ -83,6 +84,7 @@ func (s *Data) loadDataFromDB() error {
 	for i, sqliteAlias := range sqliteAliases {
 		s.Aliases[i] = Alias{
 			ID:        sqliteAlias.ID,
+			Name:      sqliteAlias.Name,
 			Value:     sqliteAlias.Value,
 			CreatedAt: sqliteAlias.CreatedAt,
 			UpdatedAt: sqliteAlias.UpdatedAt,

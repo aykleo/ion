@@ -232,7 +232,7 @@ func listSecrets(args []string, configPath string, dataRef data.IData) tea.Cmd {
 		b.WriteString("Name             Value         Salt         Tags                    Updated\n")
 		b.WriteString("----             -----         ----         ----                    -------\n")
 		for _, secret := range secrets {
-			name := secret.ID
+			name := secret.Name
 			if len(name) > 15 {
 				name = name[:12] + "..."
 			}
