@@ -337,7 +337,7 @@ func FormatSecretsAsJSON(secrets []data.Secret) string {
 	var jsonSecrets []JSONSecret
 	for _, secret := range secrets {
 		jsonSecrets = append(jsonSecrets, JSONSecret{
-			Name:      secret.ID,
+			Name:      secret.Name,
 			Value:     secret.Value,
 			Salt:      secret.Salt,
 			Tags:      secret.Tags,

@@ -1,16 +1,17 @@
 package data
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
+	"database/sql"
+
+	"github.com/aykleo/ion/data/sqlite"
 )
 
 type IData interface {
 	GetUser() User
 	GetData() IData
+	SetDB(db *sql.DB)
 
-	GetOrCreateDataFields(path string) (IData, bool)
+	GetInitialData(path string) (IData, bool)
 
 	SetUsername(name, path string)
 
@@ -24,49 +25,71 @@ type IData interface {
 	CopySecretToClipboard(args []string, path string) error
 }
 
-func (s *Data) GetUser() User {
-	return s.User
-}
-
 func NewData() IData {
 	data := InitData()
 	return &data
 }
+
 func (s *Data) GetData() IData {
 	return s
 }
 
-func (s *Data) GetOrCreateDataFields(path string) (IData, bool) {
-	dataPath := filepath.Join(path, "data.json")
+func (s *Data) SetDB(db *sql.DB) {
+	s.db = db
+}
 
-	if _, err := os.Stat(dataPath); os.IsNotExist(err) {
-		emptyData := s.GetData()
+func (s *Data) GetInitialData(path string) (IData, bool) {
 
-		if err := os.MkdirAll(filepath.Dir(dataPath), 0755); err != nil {
-			return nil, false
-		}
-
-		jsonData, err := json.MarshalIndent(emptyData, "", "  ")
-		if err != nil {
-			return nil, false
-		}
-
-		if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
-			return nil, false
-		}
-
-		return emptyData, false
+	if s.db == nil {
+		return s, false
 	}
 
-	fileData, err := os.ReadFile(dataPath)
+	if err := s.loadDataFromDB(); err != nil {
+		return s, false
+	}
+
+	return s, true
+}
+
+func (s *Data) loadDataFromDB() error {
+	sqliteUser, err := sqlite.GetUser(s.db)
 	if err != nil {
-		return nil, false
+		return err
+	}
+	s.User = User{Username: sqliteUser.Username}
+
+	sqliteSecrets, err := sqlite.GetSecrets(s.db)
+	if err != nil {
+		return err
+	}
+	s.Secrets = make([]Secret, len(sqliteSecrets))
+	for i, sqliteSecret := range sqliteSecrets {
+		s.Secrets[i] = Secret{
+			ID:        sqliteSecret.ID,
+			Name:      sqliteSecret.Name,
+			Salt:      sqliteSecret.Salt,
+			Value:     sqliteSecret.Value,
+			Tags:      sqliteSecret.Tags,
+			CreatedAt: sqliteSecret.CreatedAt,
+			UpdatedAt: sqliteSecret.UpdatedAt,
+		}
+	}
+	s.buildSecretIndex()
+
+	sqliteAliases, err := sqlite.GetAliases(s.db)
+	if err != nil {
+		return err
+	}
+	s.Aliases = make([]Alias, len(sqliteAliases))
+	for i, sqliteAlias := range sqliteAliases {
+		s.Aliases[i] = Alias{
+			ID:        sqliteAlias.ID,
+			Name:      sqliteAlias.Name,
+			Value:     sqliteAlias.Value,
+			CreatedAt: sqliteAlias.CreatedAt,
+			UpdatedAt: sqliteAlias.UpdatedAt,
+		}
 	}
 
-	var data Data
-	if err := json.Unmarshal(fileData, &data); err != nil {
-		return nil, false
-	}
-
-	return &data, true
+	return nil
 }

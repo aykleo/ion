@@ -208,6 +208,16 @@ func listSecrets(args []string, configPath string, dataRef data.IData) tea.Cmd {
 			}
 		}
 	}
+	if len(secrets) == 0 {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     errors.New("no secrets found"),
+				Command: "ion secret list",
+				Output:  "no secrets found, try adding one with ion secret add <name> <value>",
+				NewDir:  currentDir,
+			}
+		}
+	}
 	if isJson {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
@@ -222,7 +232,7 @@ func listSecrets(args []string, configPath string, dataRef data.IData) tea.Cmd {
 		b.WriteString("Name             Value         Salt         Tags                    Updated\n")
 		b.WriteString("----             -----         ----         ----                    -------\n")
 		for _, secret := range secrets {
-			name := secret.ID
+			name := secret.Name
 			if len(name) > 15 {
 				name = name[:12] + "..."
 			}
