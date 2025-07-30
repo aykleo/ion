@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"os"
 
 	"github.com/aykleo/ion/config"
@@ -16,6 +17,7 @@ type terminal struct {
 	currentFolder string
 	config        config.IConfig
 	data          data.IData
+	db            *sql.DB
 	input         textinput.ITextInput
 	pager         pager.IPager
 }

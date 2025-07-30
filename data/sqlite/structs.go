@@ -1,16 +1,9 @@
-package data
+package sqlite
 
-import (
-	"database/sql"
-	"time"
-)
+import "time"
 
-type Data struct {
-	User        User
-	Secrets     []Secret
-	Aliases     []Alias
-	secretIndex map[string]int
-	db          *sql.DB
+type User struct {
+	Username string
 }
 
 type Secret struct {
@@ -27,8 +20,4 @@ type Alias struct {
 	Value     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-type User struct {
-	Username string
 }

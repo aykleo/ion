@@ -14,18 +14,23 @@ import (
 
 func main() {
 	config := config.Init()
-	sqlite.InitSQLite()
+	db, err := sqlite.InitSQLite()
+	if err != nil {
+		fmt.Printf("Error initializing SQLite: %v\n", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+
 	input := textinput.NewTextInput()
 	data := data.NewData()
-	dataFields, exists := data.GetOrCreateDataFields(config.GetPath())
-	if exists {
-		data = dataFields
-	}
+	data.SetDB(db)
+	data.GetInitialData(config.GetPath())
 	folder := getFolderFromOs()
 	pager := pager.NewPager()
 	m := terminal{
 		input:         input,
 		data:          data,
+		db:            db,
 		currentFolder: folder,
 		pager:         pager,
 		config:        config,

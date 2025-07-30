@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"database/sql"
-	"log"
 	"path/filepath"
 
 	"github.com/aykleo/ion/config"
@@ -10,17 +9,20 @@ import (
 	_ "github.com/glebarez/go-sqlite"
 )
 
-func InitSQLite() {
+func InitSQLite() (*sql.DB, error) {
 	path := config.GetConfigPath()
 	dbPath := filepath.Join(path, "data.db")
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	defer db.Close()
+	if err := CreateAllTables(db); err != nil {
+		db.Close()
+		return nil, err
+	}
 
-	CreateAllTables(db)
+	return db, nil
 }
 
 func CreateUsersTable(db *sql.DB) error {

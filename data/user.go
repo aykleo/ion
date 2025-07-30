@@ -1,21 +1,21 @@
 package data
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
+	"github.com/aykleo/ion/data/sqlite"
 )
 
 func (s *Data) SetUsername(name, path string) {
+	if s.db == nil {
+		panic("database connection not available")
+	}
+
+	if err := sqlite.SetUser(s.db, name); err != nil {
+		panic(err)
+	}
+
 	s.User.Username = name
+}
 
-	dataPath := filepath.Join(path, "data.json")
-	jsonData, err := json.MarshalIndent(s, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-
-	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
-		panic(err)
-	}
+func (s *Data) GetUser() User {
+	return s.User
 }

@@ -208,6 +208,16 @@ func listSecrets(args []string, configPath string, dataRef data.IData) tea.Cmd {
 			}
 		}
 	}
+	if len(secrets) == 0 {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     errors.New("no secrets found"),
+				Command: "ion secret list",
+				Output:  "no secrets found, try adding one with ion secret add <name> <value>",
+				NewDir:  currentDir,
+			}
+		}
+	}
 	if isJson {
 		return func() tea.Msg {
 			return CommandFinishedMsg{

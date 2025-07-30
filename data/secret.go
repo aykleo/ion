@@ -1,17 +1,19 @@
 package data
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
-	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/atotto/clipboard"
+	"github.com/aykleo/ion/data/sqlite"
 )
 
 func (s *Data) AddSecret(args []string, path string) error {
+	if s.db == nil {
+		return errors.New("database connection not available")
+	}
+
 	if len(args) < 2 {
 		return errors.New("invalid arguments, use ion secret add <name> <value> with optional -s <salt> and -t <tag1> <tag2>")
 	}
@@ -26,44 +28,42 @@ func (s *Data) AddSecret(args []string, path string) error {
 		return err
 	}
 
-	dataPath := filepath.Join(path, "data.json")
-
-	var data Data
-	fileData, err := os.ReadFile(dataPath)
-	if err != nil {
-		data = *s
-	} else {
-		if err := json.Unmarshal(fileData, &data); err != nil {
-			return err
-		}
-	}
-
-	data.Secrets = append(data.Secrets, Secret{
+	sqliteSecret := sqlite.Secret{
 		ID:        name,
 		Salt:      salt,
 		Value:     encrypt(salt, value),
 		Tags:      tgs,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-	})
+	}
 
-	s.Secrets = data.Secrets
+	if err := sqlite.AddSecret(s.db, sqliteSecret); err != nil {
+		return err
+	}
+
+	dataSecret := Secret{
+		ID:        sqliteSecret.ID,
+		Salt:      sqliteSecret.Salt,
+		Value:     sqliteSecret.Value,
+		Tags:      sqliteSecret.Tags,
+		CreatedAt: sqliteSecret.CreatedAt,
+		UpdatedAt: sqliteSecret.UpdatedAt,
+	}
+	s.Secrets = append(s.Secrets, dataSecret)
 	s.addToSecretIndex(name, len(s.Secrets)-1)
 
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
-		return err
-	}
 	return nil
 }
 
 func (s *Data) UpdateSecretValue(args []string, path string) error {
+	if s.db == nil {
+		return errors.New("database connection not available")
+	}
+
 	if len(args) != 2 {
 		return errors.New("invalid arguments, use ion secret update <name> <new-value>")
 	}
+
 	var b strings.Builder
 	secretName := args[len(args)-2]
 	b.WriteString("secret ")
@@ -79,112 +79,75 @@ func (s *Data) UpdateSecretValue(args []string, path string) error {
 		return err
 	}
 
-	dataPath := filepath.Join(path, "data.json")
+	currentSalt := s.Secrets[index].Salt
+	encryptedValue := encrypt(currentSalt, value)
 
-	var data Data
-	fileData, err := os.ReadFile(dataPath)
-	if err != nil {
-		data = *s
-	} else {
-		if err := json.Unmarshal(fileData, &data); err != nil {
-			return err
-		}
-	}
-
-	currentTags := data.Secrets[index].Tags
-	currentSalt := data.Secrets[index].Salt
-
-	data.Secrets[index] = Secret{
-		ID:        name,
-		Salt:      currentSalt,
-		Value:     encrypt(currentSalt, value),
-		Tags:      currentTags,
-		CreatedAt: data.Secrets[index].CreatedAt,
-		UpdatedAt: time.Now(),
-	}
-
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
+	if err := sqlite.UpdateSecretValue(s.db, name, encryptedValue); err != nil {
 		return err
 	}
 
-	*s = data
 	s.ensureSecretIndex()
+	if index, exists := s.secretIndex[name]; exists {
+		s.Secrets[index].Value = encryptedValue
+		s.Secrets[index].UpdatedAt = time.Now()
+	}
 
 	return nil
 }
 
 func (s *Data) UpdateSecretName(args []string, path string) error {
+	if s.db == nil {
+		return errors.New("database connection not available")
+	}
+
 	if len(args) != 2 {
 		return errors.New("invalid arguments, use ion secret rename <name> <new-name>")
 	}
+
 	var b strings.Builder
 	secretName := args[len(args)-2]
 	b.WriteString("secret ")
 	b.WriteString(secretName)
 	b.WriteString(" was not found")
-	exists, index := s.checkIfSecretExists(secretName)
+	exists, _ := s.checkIfSecretExists(secretName)
 	if !exists {
 		return errors.New(b.String())
 	}
 
-	_, value, _, _, err := s.extractArgs(args, false)
+	_, newName, _, _, err := s.extractArgs(args, false)
 	if err != nil {
 		return err
 	}
 
-	dataPath := filepath.Join(path, "data.json")
-
-	var data Data
-	fileData, err := os.ReadFile(dataPath)
-	if err != nil {
-		data = *s
-	} else {
-		if err := json.Unmarshal(fileData, &data); err != nil {
-			return err
-		}
-	}
-
-	currentTags := data.Secrets[index].Tags
-	currentSalt := data.Secrets[index].Salt
-	currentValue := data.Secrets[index].Value
-
-	data.Secrets[index] = Secret{
-		ID:        value,
-		Salt:      currentSalt,
-		Value:     currentValue,
-		Tags:      currentTags,
-		CreatedAt: data.Secrets[index].CreatedAt,
-		UpdatedAt: time.Now(),
-	}
-
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
+	if err := sqlite.UpdateSecretName(s.db, secretName, newName); err != nil {
 		return err
 	}
 
-	*s = data
-	s.updateSecretIndex(secretName, value, index)
+	s.ensureSecretIndex()
+	if index, exists := s.secretIndex[secretName]; exists {
+		s.Secrets[index].ID = newName
+		s.Secrets[index].UpdatedAt = time.Now()
+		s.updateSecretIndex(secretName, newName, index)
+	}
 
 	return nil
 }
 
 func (s *Data) UpdateSecretTags(args []string, path string) error {
+	if s.db == nil {
+		return errors.New("database connection not available")
+	}
+
 	if len(args) < 2 {
 		return errors.New("invalid arguments, use ion secret tag <tag1> <tag2> <name>")
 	}
+
 	var b strings.Builder
 	secretName := args[len(args)-1]
 	b.WriteString("secret ")
 	b.WriteString(secretName)
 	b.WriteString(" was not found")
-	exists, index := s.checkIfSecretExists(secretName)
+	exists, _ := s.checkIfSecretExists(secretName)
 	if !exists {
 		return errors.New(b.String())
 	}
@@ -194,46 +157,28 @@ func (s *Data) UpdateSecretTags(args []string, path string) error {
 		tagArgs[i] = strings.ToUpper(tag)
 	}
 
-	dataPath := filepath.Join(path, "data.json")
-
-	var data Data
-	fileData, err := os.ReadFile(dataPath)
-	if err != nil {
-		data = *s
-	} else {
-		if err := json.Unmarshal(fileData, &data); err != nil {
-			return err
-		}
-	}
-
-	currentSalt := data.Secrets[index].Salt
-	currentValue := data.Secrets[index].Value
-	currentName := data.Secrets[index].ID
-
-	data.Secrets[index] = Secret{
-		ID:        currentName,
-		Salt:      currentSalt,
-		Value:     currentValue,
-		Tags:      tagArgs,
-		CreatedAt: data.Secrets[index].CreatedAt,
-		UpdatedAt: time.Now(),
-	}
-
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
+	if err := sqlite.UpdateSecretTags(s.db, secretName, tagArgs); err != nil {
 		return err
 	}
 
-	*s = data
 	s.ensureSecretIndex()
+	if index, exists := s.secretIndex[secretName]; exists {
+		s.Secrets[index].Tags = tagArgs
+		s.Secrets[index].UpdatedAt = time.Now()
+	}
 
 	return nil
 }
 
 func (s *Data) ListSecrets(args []string, path string) ([]Secret, bool, error) {
+	if s.db == nil {
+		return nil, false, errors.New("database connection not available")
+	}
+
+	if err := s.loadDataFromDB(); err != nil {
+		return nil, false, err
+	}
+
 	if len(args) == 0 {
 		return s.Secrets, false, nil
 	}
@@ -281,8 +226,16 @@ func (s *Data) ListSecrets(args []string, path string) ([]Secret, bool, error) {
 }
 
 func (s *Data) SearchSecret(args []string) ([]Secret, error) {
+	if s.db == nil {
+		return nil, errors.New("database connection not available")
+	}
+
 	if len(args) != 1 {
 		return nil, errors.New("invalid arguments, use ion secret search <name>")
+	}
+
+	if err := s.loadDataFromDB(); err != nil {
+		return nil, err
 	}
 
 	secretName := args[len(args)-1]
@@ -296,47 +249,44 @@ func (s *Data) SearchSecret(args []string) ([]Secret, error) {
 }
 
 func (s *Data) RemoveSecret(args []string, path string) error {
+	if s.db == nil {
+		return errors.New("database connection not available")
+	}
+
 	if len(args) != 1 {
 		return errors.New("invalid arguments, use ion secret remove <name>")
 	}
 
 	secretName := args[len(args)-1]
-	exists, index := s.checkIfSecretExists(secretName)
+	exists, _ := s.checkIfSecretExists(secretName)
 	if !exists {
 		return errors.New("secret was not found")
 	}
 
-	dataPath := filepath.Join(path, "data.json")
-
-	var data Data
-	fileData, err := os.ReadFile(dataPath)
-	if err != nil {
-		data = *s
-	} else {
-		if err := json.Unmarshal(fileData, &data); err != nil {
-			return err
-		}
-	}
-
-	data.Secrets = append(data.Secrets[:index], data.Secrets[index+1:]...)
-
-	jsonData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(dataPath, jsonData, 0644); err != nil {
+	if err := sqlite.RemoveSecret(s.db, secretName); err != nil {
 		return err
 	}
 
-	*s = data
-	s.removeFromSecretIndex(secretName, index)
+	s.ensureSecretIndex()
+	if index, exists := s.secretIndex[secretName]; exists {
+		s.Secrets = append(s.Secrets[:index], s.Secrets[index+1:]...)
+		s.removeFromSecretIndex(secretName, index)
+	}
 
 	return nil
 }
 
 func (s *Data) CopySecretToClipboard(args []string, path string) error {
+	if s.db == nil {
+		return errors.New("database connection not available")
+	}
+
 	if len(args) != 1 {
 		return errors.New("invalid arguments, use ion secret copy <name>")
+	}
+
+	if err := s.loadDataFromDB(); err != nil {
+		return err
 	}
 
 	secretName := args[len(args)-1]
