@@ -6,6 +6,7 @@ import (
 
 	"github.com/aykleo/ion/config"
 	"github.com/aykleo/ion/data"
+	"github.com/aykleo/ion/data/sqlite"
 	pager "github.com/aykleo/ion/ui/pager"
 	textinput "github.com/aykleo/ion/ui/text-input"
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,6 +14,7 @@ import (
 
 func main() {
 	config := config.Init()
+	sqlite.InitSQLite()
 	input := textinput.NewTextInput()
 	data := data.NewData()
 	dataFields, exists := data.GetOrCreateDataFields(config.GetPath())
