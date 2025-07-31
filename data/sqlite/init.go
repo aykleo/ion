@@ -62,7 +62,7 @@ func CreateAliasesTable(db *sql.DB) error {
 	CREATE TABLE IF NOT EXISTS aliases (
 		id TEXT PRIMARY KEY,        -- UUID - immutable
 		name TEXT NOT NULL UNIQUE,  -- User-friendly name - can be changed
-		value TEXT NOT NULL,
+		command TEXT NOT NULL,
 		created_at DATETIME NOT NULL,
 		updated_at DATETIME NOT NULL
 	)`

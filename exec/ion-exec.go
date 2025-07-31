@@ -24,6 +24,11 @@ var routes = map[string]map[string]IonCommandHandler{
 		"remove": removeSecret,
 		"use":    copySecretToClipboard,
 	},
+	"alias": {
+		"add": addAlias,
+		// "remove": removeAlias,
+		// "list":   listAliases,
+	},
 }
 
 func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {

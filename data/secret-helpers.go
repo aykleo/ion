@@ -66,7 +66,7 @@ func (s *Data) updateSecretIndex(oldName, newName string, index int) {
 	s.secretIndex[newName] = index
 }
 
-func (s *Data) extractArgs(args []string, generateSaltIfMissing bool) (string, string, string, []string, error) {
+func (s *Data) extractSecretArgs(args []string, generateSaltIfMissing bool) (string, string, string, []string, error) {
 	name, value, err := extractNameAndValue(args)
 	if err != nil {
 		return "", "", "", nil, err

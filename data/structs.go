@@ -10,6 +10,7 @@ type Data struct {
 	Secrets     []Secret
 	Aliases     []Alias
 	secretIndex map[string]int
+	aliasIndex  map[string]int
 	db          *sql.DB
 }
 
@@ -26,7 +27,7 @@ type Secret struct {
 type Alias struct {
 	ID        string
 	Name      string
-	Value     string
+	Command   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

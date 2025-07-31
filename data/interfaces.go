@@ -23,6 +23,8 @@ type IData interface {
 	SearchSecret(args []string) ([]Secret, error)
 	RemoveSecret(args []string, path string) error
 	CopySecretToClipboard(args []string, path string) error
+
+	AddAlias(args []string, path string) error
 }
 
 func NewData() IData {
@@ -85,7 +87,7 @@ func (s *Data) loadDataFromDB() error {
 		s.Aliases[i] = Alias{
 			ID:        sqliteAlias.ID,
 			Name:      sqliteAlias.Name,
-			Value:     sqliteAlias.Value,
+			Command:   sqliteAlias.Command,
 			CreatedAt: sqliteAlias.CreatedAt,
 			UpdatedAt: sqliteAlias.UpdatedAt,
 		}

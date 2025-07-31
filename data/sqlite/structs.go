@@ -19,7 +19,7 @@ type Secret struct {
 type Alias struct {
 	ID        string
 	Name      string
-	Value     string
+	Command   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
