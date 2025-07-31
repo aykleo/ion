@@ -8,24 +8,26 @@ import (
 )
 
 const (
-	MainThemeColor   = "123"
-	FolderColor      = "2"
-	SuccessColor     = "42"
-	ErrorColor       = "203"
-	CommandColor     = "4"
-	OutputColor      = "7"
-	TableHeaderColor = "6"
-	TableBorderColor = "8"
-	MiscColor        = "212"
+	MainThemeColor      = "123"
+	FolderColor         = "2"
+	SuccessColor        = "42"
+	ErrorColor          = "203"
+	CommandColor        = "4"
+	OutputColor         = "7"
+	TableHeaderColor    = "6"
+	TableBorderColor    = "8"
+	MiscColor           = "212"
+	FadedColor          = "244"
 )
 
 var (
-	MainTheme     = lipgloss.NewStyle().Foreground(lipgloss.Color(MainThemeColor))
-	Placeholder   = MainTheme.Italic(true).Faint(true)
-	FolderStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color(FolderColor)).Bold(false).Padding(1).Background(lipgloss.Color(MainThemeColor))
-	TerminalStyle = lipgloss.NewStyle().Padding(1, 2)
-	NoStyle       = lipgloss.NewStyle()
-	MiscStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color(MiscColor))
+	MainTheme           = lipgloss.NewStyle().Foreground(lipgloss.Color(MainThemeColor))
+	Placeholder         = MainTheme.Italic(true).Faint(true)
+	FolderStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color(FolderColor)).Bold(false).Padding(1).Background(lipgloss.Color(MainThemeColor))
+	TerminalStyle       = lipgloss.NewStyle().Padding(1, 2)
+	NoStyle             = lipgloss.NewStyle()
+	MiscStyle           = lipgloss.NewStyle().Foreground(lipgloss.Color(MiscColor))
+	FadedStyle          = lipgloss.NewStyle().Foreground(lipgloss.Color(FadedColor))
 )
 
 var (

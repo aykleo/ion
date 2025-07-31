@@ -64,7 +64,9 @@ func (m *Input) doCommand(msg string) (tea.Cmd, error) {
 		commandName = parts[0]
 	}
 
+	alias := m.input.Value()
 	command := CommandMsg{
+		Alias:        alias,
 		Command:      commandName,
 		Args:         args,
 		IsIonCommand: isIonCommand,

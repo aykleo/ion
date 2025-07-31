@@ -49,7 +49,17 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fullCommand = msg.Command + " " + strings.Join(msg.Args, " ")
 			}
 		}
-		formattedCommand := styles.FormatCommandPrompt(fullCommand, m.data.GetUser().Username)
+		cmdString := fullCommand
+		if aliasArgs != nil && msg.Alias != "" {
+			var b strings.Builder
+			b.WriteString(msg.Alias)
+			b.WriteString(" ")
+			b.WriteString(styles.MiscStyle.Render("("))
+			b.WriteString(styles.FadedStyle.Render(strings.Join(aliasArgs, " ")))
+			b.WriteString(styles.MiscStyle.Render(")"))
+			cmdString = b.String()
+		}
+		formattedCommand := styles.FormatCommandPrompt(cmdString, m.data.GetUser().Username)
 		_, pagerCmd := m.pager.AppendCommand(formattedCommand)
 		if isIonCommand {
 			ionCmd := exec.ExecIonCommand(msg.Args, m.data)
