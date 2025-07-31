@@ -3,6 +3,7 @@ package main
 import (
 	"strings"
 
+	"github.com/aykleo/ion/data"
 	"github.com/aykleo/ion/exec"
 	"github.com/aykleo/ion/ui/styles"
 	textinput "github.com/aykleo/ion/ui/text-input"
@@ -30,6 +31,17 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case textinput.CommandMsg:
 		isIonCommand := msg.IsIonCommand
 		fullCommand := msg.Command
+		aliasArgs := checkForAlias(msg.Command, m.data)
+		if aliasArgs != nil {
+			msg.Command = aliasArgs[0]
+			if len(aliasArgs) > 1 {
+				msg.Args = append(aliasArgs[1:], msg.Args...)
+				if aliasArgs[0] == "ion" {
+					msg.Args = append([]string{"ion"}, msg.Args...)
+					isIonCommand = true
+				}
+			}
+		}
 		if len(msg.Args) > 0 {
 			if isIonCommand {
 				fullCommand = strings.Join(msg.Args, " ")
@@ -75,4 +87,14 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	_, inputCmd := m.input.Update(msg)
 	_, pagerCmd := m.pager.Update(msg)
 	return m, tea.Batch(inputCmd, pagerCmd)
+}
+
+func checkForAlias(command string, data data.IData) []string {
+	aliases, _, _ := data.ListAliases([]string{}, "")
+	for _, alias := range aliases {
+		if alias.Name == command {
+			return strings.Split(alias.Command, " ")
+		}
+	}
+	return nil
 }
