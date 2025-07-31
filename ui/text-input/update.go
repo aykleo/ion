@@ -65,8 +65,13 @@ func (m *Input) doCommand(msg string) (tea.Cmd, error) {
 		args = parts
 	}
 
+	var commandName string
+	if len(parts) > 0 {
+		commandName = parts[0]
+	}
+
 	command := CommandMsg{
-		Command:      msg,
+		Command:      commandName,
 		Args:         args,
 		IsIonCommand: isIonCommand,
 	}
