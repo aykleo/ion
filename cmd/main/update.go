@@ -29,7 +29,15 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case textinput.CommandMsg:
 		isIonCommand := msg.IsIonCommand
-		formattedCommand := styles.FormatCommandPrompt(msg.Command, m.data.GetUser().Username)
+		fullCommand := msg.Command
+		if len(msg.Args) > 0 {
+			if isIonCommand {
+				fullCommand = strings.Join(msg.Args, " ")
+			} else {
+				fullCommand = msg.Command + " " + strings.Join(msg.Args, " ")
+			}
+		}
+		formattedCommand := styles.FormatCommandPrompt(fullCommand, m.data.GetUser().Username)
 		_, pagerCmd := m.pager.AppendCommand(formattedCommand)
 		if isIonCommand {
 			ionCmd := exec.ExecIonCommand(msg.Args, m.data)

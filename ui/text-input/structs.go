@@ -16,3 +16,9 @@ type Input struct {
 	err            error
 	FirstWordStyle lipgloss.Style
 }
+
+type CommandMsg struct {
+	Command      string
+	Args         []string
+	IsIonCommand bool
+}
