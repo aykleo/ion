@@ -44,12 +44,6 @@ func (m *Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-type CommandMsg struct {
-	Command      string
-	Args         []string
-	IsIonCommand bool
-}
-
 func (m *Input) doCommand(msg string) (tea.Cmd, error) {
 	defer m.input.Reset()
 	isIonCommand := strings.HasPrefix(msg, "ion")
