@@ -311,7 +311,7 @@ func copySecretToClipboard(args []string, configPath string, dataRef data.IData)
 		b.WriteString(args[(len(args) - 1)])
 		b.WriteString(" copied to clipboard")
 		return CommandFinishedMsg{
-			Command: "ion secret copy",
+			Command: "ion secret use",
 			Output:  b.String(),
 			NewDir:  currentDir,
 		}

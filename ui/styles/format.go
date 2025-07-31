@@ -117,6 +117,9 @@ func formatTable(output string) string {
 		if strings.Contains(line, "Name") && strings.Contains(line, "Value") && strings.Contains(line, "Salt") && strings.Contains(line, "Tags") && strings.Contains(line, "Updated") {
 			return formatSecretListInTable(output)
 		}
+		if strings.Contains(line, "Name") && strings.Contains(line, "Command") && strings.Contains(line, "Updated") {
+			return formatAliasListInTable(output)
+		}
 	}
 
 	var formattedLines []string
@@ -352,4 +355,108 @@ func FormatSecretsAsJSON(secrets []data.Secret) string {
 	}
 
 	return string(jsonData)
+}
+
+func FormatAliasesAsJSON(aliases []data.Alias) string {
+	type JSONAlias struct {
+		Name      string    `json:"name"`
+		Command   string    `json:"command"`
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
+	}
+
+	var jsonAliases []JSONAlias
+	for _, alias := range aliases {
+		jsonAliases = append(jsonAliases, JSONAlias{
+			Name:      alias.Name,
+			Command:   alias.Command,
+			CreatedAt: alias.CreatedAt,
+			UpdatedAt: alias.UpdatedAt,
+		})
+	}
+
+	jsonData, err := json.MarshalIndent(jsonAliases, "", "  ")
+	if err != nil {
+		return "Error formatting JSON: " + err.Error()
+	}
+
+	return string(jsonData)
+}
+
+func formatAliasRow(line string) string {
+	if len(line) < 50 {
+		return TableRowStyle.Render(line)
+	}
+
+	name := strings.TrimSpace(line[0:17])
+	command := strings.TrimSpace(line[17:50])
+	updated := strings.TrimSpace(line[50:])
+
+	nameWithEmoji := "⚡ " + name
+	styledName := MainTheme.Bold(true).Render(nameWithEmoji)
+
+	nameCol := lipgloss.NewStyle().Width(17).Render(styledName)
+	commandCol := lipgloss.NewStyle().Width(33).Render(command)
+	updatedCol := lipgloss.NewStyle().Render(updated)
+
+	return TableRowStyle.Render(
+		lipgloss.JoinHorizontal(lipgloss.Left,
+			nameCol, " ",
+			commandCol, " ",
+			updatedCol,
+		),
+	)
+}
+
+func formatAliasListInTable(output string) string {
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	var formattedLines []string
+	var headerFound bool
+
+	for i, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine == "" {
+			if len(formattedLines) > 0 {
+				formattedLines = append(formattedLines, "")
+			}
+			continue
+		}
+
+		if strings.Contains(line, "Name") && strings.Contains(line, "Command") && strings.Contains(line, "Updated") {
+			headerFound = true
+			nameHeader := lipgloss.NewStyle().Width(17).Render("⚡ Name")
+			commandHeader := lipgloss.NewStyle().Width(33).Render("Command")
+			updatedHeader := lipgloss.NewStyle().Render("Updated")
+
+			headerLine := lipgloss.JoinHorizontal(lipgloss.Left,
+				nameHeader, " ",
+				commandHeader, " ",
+				updatedHeader,
+			)
+
+			styled := TableHeaderStyle.Render(headerLine)
+			formattedLines = append(formattedLines, styled)
+			continue
+		}
+
+		if regexp.MustCompile(`^-+\s+-+`).MatchString(trimmedLine) {
+			separator := TableBorderStyle.Render(strings.Repeat("─", 65))
+			formattedLines = append(formattedLines, separator)
+			continue
+		}
+
+		if headerFound && i > 1 && trimmedLine != "" {
+			formatted := formatAliasRow(line)
+			formattedLines = append(formattedLines, formatted)
+			continue
+		}
+
+		formattedLines = append(formattedLines, TableRowStyle.Render(line))
+	}
+
+	for len(formattedLines) > 0 && strings.TrimSpace(formattedLines[len(formattedLines)-1]) == "" {
+		formattedLines = formattedLines[:len(formattedLines)-1]
+	}
+
+	return strings.Join(formattedLines, "\n")
 }

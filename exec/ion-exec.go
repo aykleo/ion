@@ -25,9 +25,11 @@ var routes = map[string]map[string]IonCommandHandler{
 		"use":    copySecretToClipboard,
 	},
 	"alias": {
-		"add": addAlias,
-		// "remove": removeAlias,
-		// "list":   listAliases,
+		"add":    addAlias,
+		"update": updateAlias,
+		"rename": renameAlias,
+		"remove": removeAlias,
+		"list":   listAliases,
 	},
 }
 

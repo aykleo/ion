@@ -25,6 +25,10 @@ type IData interface {
 	CopySecretToClipboard(args []string, path string) error
 
 	AddAlias(args []string, path string) error
+	UpdateAlias(args []string, path string) error
+	RenameAlias(args []string, path string) error
+	RemoveAlias(args []string, path string) error
+	ListAliases(args []string, path string) ([]Alias, bool, error)
 }
 
 func NewData() IData {

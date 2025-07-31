@@ -33,3 +33,19 @@ func GetAliases(db *sql.DB) ([]Alias, error) {
 
 	return aliases, nil
 }
+
+func UpdateAlias(db *sql.DB, alias Alias) error {
+	_, err := db.Exec(`
+		UPDATE aliases 
+		SET name = ?, command = ?, updated_at = ?
+		WHERE id = ?
+	`, alias.Name, alias.Command, alias.UpdatedAt, alias.ID)
+	return err
+}
+
+func RemoveAlias(db *sql.DB, id string) error {
+	_, err := db.Exec(`
+		DELETE FROM aliases WHERE id = ?
+	`, id)
+	return err
+}
