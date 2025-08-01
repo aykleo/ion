@@ -36,7 +36,7 @@ var routes = map[string]map[string]IonCommandHandler{
 func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 	configPath := config.GetConfigPath()
 
-	if args[0] == "ionize" && len(args) == 1 {
+	if len(args) > 0 && args[0] == "ionize" && len(args) == 1 {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
 				Command: "ionize",
