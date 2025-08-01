@@ -24,12 +24,19 @@ var routes = map[string]map[string]IonCommandHandler{
 		"remove": removeSecret,
 		"use":    copySecretToClipboard,
 	},
+	"alias": {
+		"add":    addAlias,
+		"update": updateAlias,
+		"rename": renameAlias,
+		"remove": removeAlias,
+		"list":   listAliases,
+	},
 }
 
 func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 	configPath := config.GetConfigPath()
 
-	if args[0] == "ionize" && len(args) == 1 {
+	if len(args) > 0 && args[0] == "ionize" && len(args) == 1 {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
 				Command: "ionize",

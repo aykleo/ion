@@ -18,6 +18,7 @@ type Input struct {
 }
 
 type CommandMsg struct {
+	Alias        string
 	Command      string
 	Args         []string
 	IsIonCommand bool

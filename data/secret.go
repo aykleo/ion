@@ -23,7 +23,7 @@ func (s *Data) AddSecret(args []string, path string) error {
 		return errors.New("secret already exists, use ion secret update <name> <new-value> to change it")
 	}
 
-	name, value, salt, tgs, err := s.extractArgs(args, true)
+	name, value, salt, tgs, err := s.extractSecretArgs(args, true)
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (s *Data) UpdateSecretValue(args []string, path string) error {
 		return errors.New(b.String())
 	}
 
-	name, value, _, _, err := s.extractArgs(args, false)
+	name, value, _, _, err := s.extractSecretArgs(args, false)
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func (s *Data) UpdateSecretName(args []string, path string) error {
 		return errors.New(b.String())
 	}
 
-	_, newName, _, _, err := s.extractArgs(args, false)
+	_, newName, _, _, err := s.extractSecretArgs(args, false)
 	if err != nil {
 		return err
 	}
