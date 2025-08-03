@@ -10,4 +10,5 @@ type Pager struct {
 	ready       bool
 	viewport    viewport.Model
 	currentPath string
+	zenMode     bool
 }

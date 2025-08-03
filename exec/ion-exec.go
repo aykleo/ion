@@ -8,32 +8,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type IonCommandHandler func(args []string, configPath string, dataRef data.IData) tea.Cmd
-
-var routes = map[string]map[string]IonCommandHandler{
-	"user": {
-		"rename": changeUsername,
-	},
-	"secret": {
-		"add":    addSecret,
-		"update": updateSecretValue,
-		"rename": updateSecretName,
-		"tags":   updateSecretTags,
-		"list":   listSecrets,
-		"search": searchSecret,
-		"remove": removeSecret,
-		"use":    copySecretToClipboard,
-	},
-	"alias": {
-		"add":    addAlias,
-		"update": updateAlias,
-		"rename": renameAlias,
-		"remove": removeAlias,
-		"list":   listAliases,
-		"search": searchAliases,
-	},
-}
-
 func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 	configPath := config.GetConfigPath()
 
@@ -45,6 +19,15 @@ func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 			}
 		}
 	}
+
+	if len(args) == 2 {
+		action := args[1]
+
+		if handler, actionExists := simpleCmds[action]; actionExists {
+			return handler(args)
+		}
+	}
+
 	if len(args) < 3 {
 		return func() tea.Msg {
 			return CommandFinishedMsg{
@@ -55,7 +38,6 @@ func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 			}
 		}
 	}
-
 	category := args[1]
 	action := args[2]
 	args = args[3:]
@@ -68,9 +50,9 @@ func ExecIonCommand(args []string, dataRef data.IData) tea.Cmd {
 
 	return func() tea.Msg {
 		return CommandFinishedMsg{
-			Err:     errors.New("command not found, please use ion help"),
+			Err:     errors.New("command not found"),
 			Command: "ion",
-			Output:  "command not found",
+			Output:  "command not found, please use ion help",
 			NewDir:  currentDir,
 		}
 	}

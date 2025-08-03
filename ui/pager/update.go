@@ -1,6 +1,7 @@
 package pager
 
 import (
+	"github.com/aykleo/ion/exec"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -51,6 +52,10 @@ func (m *Pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case UpdateContentMsg:
 		m.viewport.SetContent(m.wrapContent())
 		m.viewport.GotoBottom()
+		return m, nil
+
+	case exec.ToggleZenModeMsg:
+		m.zenMode = !m.zenMode
 		return m, nil
 	}
 

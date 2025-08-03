@@ -9,3 +9,4 @@ type CommandFinishedMsg struct {
 }
 
 type CommandClearMsg struct{}
+type ToggleZenModeMsg struct{}

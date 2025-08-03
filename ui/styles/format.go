@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aykleo/ion/config"
 	"github.com/aykleo/ion/data"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -482,7 +483,7 @@ func FormatSearchedAlias(alias data.Alias) string {
 	b.WriteString(MiscStyle.Render("="))
 	b.WriteString(" ")
 	for i, command := range cmds {
-		if command == "${ion}" {
+		if command == config.CustomAliasPlaceholder {
 			if i != 0 {
 				b.WriteString(" ")
 			}

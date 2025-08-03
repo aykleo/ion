@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/aykleo/ion/config"
 	"github.com/aykleo/ion/data"
 	"github.com/aykleo/ion/exec"
 	"github.com/aykleo/ion/ui/styles"
 	textinput "github.com/aykleo/ion/ui/text-input"
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-const CustomAliasPlaceholder = "${ion}"
 
 func checkForPipeCmds(cmd []string) ([]textinput.CommandMsg, bool) {
 	separator := "&&"
@@ -153,7 +152,7 @@ func (m *terminal) finishCommand(msg exec.CommandFinishedMsg) (tea.Model, tea.Cm
 }
 
 func containsDynamicPlaceholders(command []string) bool {
-	dynamicValue := CustomAliasPlaceholder
+	dynamicValue := config.CustomAliasPlaceholder
 	for _, arg := range command {
 		if arg == dynamicValue {
 			return true
@@ -163,7 +162,7 @@ func containsDynamicPlaceholders(command []string) bool {
 }
 
 func countDynamicPlaceholders(command []string) int {
-	dynamicValue := CustomAliasPlaceholder
+	dynamicValue := config.CustomAliasPlaceholder
 	count := 0
 	for _, arg := range command {
 		if arg == dynamicValue {
@@ -174,7 +173,7 @@ func countDynamicPlaceholders(command []string) int {
 }
 
 func translateDynamicAlias(originalCommand []string, newValues []string) []string {
-	dynamicValue := CustomAliasPlaceholder
+	dynamicValue := config.CustomAliasPlaceholder
 	translatedCommand := make([]string, len(originalCommand))
 	valueIndex := 0
 

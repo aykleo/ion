@@ -33,18 +33,32 @@ func (m *Pager) SetHeight(height int) int {
 		return 0
 	}
 	if height < 10 {
+		if m.zenMode {
+			return int(float64(height) * 0.45)
+		}
 		return int(float64(height) * 0.4)
 	}
 	if height < 20 {
+		if m.zenMode {
+			return int(float64(height) * 0.75)
+		}
 		return int(float64(height) * 0.7)
 	}
 	if height < 30 {
+		if m.zenMode {
+			return int(float64(height) * 0.85)
+		}
 		return int(float64(height) * 0.8)
 	}
 	if height < 40 {
+		if m.zenMode {
+			return int(float64(height) * 0.9)
+		}
 		return int(float64(height) * 0.85)
 	}
-
+	if m.zenMode {
+		return int(float64(height) * 0.95)
+	}
 	return int(float64(height) * 0.9)
 
 }

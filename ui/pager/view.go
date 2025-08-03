@@ -19,6 +19,9 @@ func (m *Pager) View() string {
 }
 
 func (m *Pager) headerView(t string) string {
+	if m.zenMode {
+		return ""
+	}
 	title := styles.PagerTitleStyle.Render("📁 " + t)
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
 	line = styles.MainTheme.Render(line)
@@ -26,6 +29,9 @@ func (m *Pager) headerView(t string) string {
 }
 
 func (m *Pager) footerView() string {
+	if m.zenMode {
+		return ""
+	}
 	info := styles.PagerInfoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(info)))
 	line = styles.MainTheme.Render(line)
