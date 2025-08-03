@@ -20,6 +20,7 @@ var routes = map[string]map[string]IonCompositeCommandHandler{
 		"search": searchSecret,
 		"remove": removeSecret,
 		"use":    copySecretToClipboard,
+		"help":   helpSecret,
 	},
 	"alias": {
 		"add":    addAlias,
@@ -28,11 +29,13 @@ var routes = map[string]map[string]IonCompositeCommandHandler{
 		"remove": removeAlias,
 		"list":   listAliases,
 		"search": searchAliases,
+		"help":   helpAlias,
 	},
 }
 
 type IonSimpleCommandHandler func(args []string) tea.Cmd
 
 var simpleCmds = map[string]IonSimpleCommandHandler{
-	"zen": toggleZenMode,
+	"help": help,
+	"zen":  toggleZenMode,
 }

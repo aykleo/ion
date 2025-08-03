@@ -3,6 +3,7 @@ package textinput
 import (
 	"strings"
 
+	"github.com/aykleo/ion/exec"
 	"github.com/charmbracelet/bubbles/cursor"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -37,6 +38,17 @@ func (m *Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case errMsg:
 		m.err = msg
+		return m, nil
+
+	case exec.ToggleZenModeMsg:
+		m.zenMode = !m.zenMode
+		ti := m.input
+		if !m.zenMode {
+			ti.Placeholder = "<shell-command> or ion <ion-command>"
+		} else {
+			ti.Placeholder = ""
+		}
+		m.input = ti
 		return m, nil
 	}
 

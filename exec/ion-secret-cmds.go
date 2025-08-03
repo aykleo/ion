@@ -318,3 +318,27 @@ func copySecretToClipboard(args []string, configPath string, dataRef data.IData)
 		}
 	}
 }
+
+func helpSecret(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	var b strings.Builder
+	b.WriteString("ion secret help\n\n")
+	b.WriteString("          ion secret add <name> <value> - add a new secret\n")
+	b.WriteString("          ion secret add -s <salt> <name> <value> - add a new secret with a custom salt\n")
+	b.WriteString("          ion secret add -t <tag1> <tag2> <name> <value> - add a new secret with tags\n\n")
+	b.WriteString("          ion secret update <name> <new-value> - update the value of a secret\n")
+	b.WriteString("          ion secret rename <name> <new-name> - rename a secret\n")
+	b.WriteString("          ion secret tag <tag1> <tag2> <name> - add tags to a secret\n")
+	b.WriteString("          ion secret list - list all secrets, you can use -j to get the output as json and -d to get the values decrypted\n")
+	b.WriteString("          ion secret search <name> - search for a secret\n")
+	b.WriteString("          ion secret remove <name> - remove a secret\n")
+	b.WriteString("          ion secret use <name> - copy a secret to clipboard already decrypted\n")
+
+	return func() tea.Msg {
+		return CommandFinishedMsg{
+			IsSystemCmd: true,
+			Command:     "ion secret help",
+			Output:      b.String(),
+			NewDir:      currentDir,
+		}
+	}
+}

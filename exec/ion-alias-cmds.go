@@ -263,3 +263,26 @@ func searchAliases(args []string, configPath string, dataRef data.IData) tea.Cmd
 		}
 	}
 }
+
+func helpAlias(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	var b strings.Builder
+	b.WriteString("ion alias help\n\n")
+	b.WriteString("          ion alias add <alias-name>=<command> - add a new alias\n")
+	b.WriteString("          ion alias update <alias-name>=<new-command> - update the command of an alias\n")
+	b.WriteString("          ion alias rename <old-name> <new-name> - rename an alias\n")
+	b.WriteString("          ion alias remove <alias-name> - remove an alias\n")
+	b.WriteString("          ion alias list - list all aliases, you can use -j to get the output as json\n")
+	b.WriteString("          ion alias search <alias-name> - search for an alias\n\n")
+	b.WriteString("          commands can be transformed dynamically with the use of ${ion} on the place of the arg you want to make dynamic\n")
+	b.WriteString("          creation example: ion alias add new-alias=echo ${ion} said ${ion}\n")
+	b.WriteString("          usage example: new-alias Bob Hello\n")
+	b.WriteString("          output: Bob said Hello\n\n")
+	return func() tea.Msg {
+		return CommandFinishedMsg{
+			IsSystemCmd: true,
+			Command:     "ion alias help",
+			Output:      b.String(),
+			NewDir:      currentDir,
+		}
+	}
+}

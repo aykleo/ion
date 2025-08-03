@@ -15,6 +15,7 @@ type Input struct {
 	cursorMode     cursor.Mode
 	err            error
 	FirstWordStyle lipgloss.Style
+	zenMode        bool
 }
 
 type CommandMsg struct {
