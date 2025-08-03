@@ -241,3 +241,25 @@ func listAliases(args []string, configPath string, dataRef data.IData) tea.Cmd {
 		}
 	}
 }
+
+func searchAliases(args []string, configPath string, dataRef data.IData) tea.Cmd {
+	alias, err := dataRef.SearchAlias(args)
+	if err != nil {
+		return func() tea.Msg {
+			return CommandFinishedMsg{
+				Err:     err,
+				Command: strings.Join(args, " "),
+				Output:  err.Error(),
+				NewDir:  currentDir,
+			}
+		}
+	}
+	return func() tea.Msg {
+		return CommandFinishedMsg{
+			IsSystemCmd: true,
+			Command:     "ion alias search",
+			Output:      styles.FormatSearchedAlias(alias[0]),
+			NewDir:      currentDir,
+		}
+	}
+}

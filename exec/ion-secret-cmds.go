@@ -261,9 +261,10 @@ func searchSecret(args []string, configPath string, dataRef data.IData) tea.Cmd 
 	}
 	return func() tea.Msg {
 		return CommandFinishedMsg{
-			Command: "ion secret search",
-			Output:  styles.FormatSecretsAsJSON(secret),
-			NewDir:  currentDir,
+			IsSystemCmd: true,
+			Command:     "ion secret search",
+			Output:      styles.FormatSearchedSecret(secret[0]),
+			NewDir:      currentDir,
 		}
 	}
 }

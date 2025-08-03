@@ -180,3 +180,26 @@ func (s *Data) ListAliases(args []string, path string) ([]Alias, bool, error) {
 
 	return s.Aliases, isJson, nil
 }
+
+func (s *Data) SearchAlias(args []string) ([]Alias, error) {
+	if s.db == nil {
+		return nil, errors.New("database connection not available")
+	}
+
+	if len(args) != 1 {
+		return nil, errors.New("invalid arguments, use ion secret alias <name>")
+	}
+
+	if err := s.loadDataFromDB(); err != nil {
+		return nil, err
+	}
+
+	aliasName := args[len(args)-1]
+
+	index, err := s.fuzzySearchAlias(aliasName)
+	if err != nil {
+		return nil, err
+	}
+
+	return []Alias{s.Aliases[index]}, nil
+}

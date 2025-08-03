@@ -30,6 +30,7 @@ var routes = map[string]map[string]IonCommandHandler{
 		"rename": renameAlias,
 		"remove": removeAlias,
 		"list":   listAliases,
+		"search": searchAliases,
 	},
 }
 

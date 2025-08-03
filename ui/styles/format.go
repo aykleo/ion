@@ -460,3 +460,45 @@ func formatAliasListInTable(output string) string {
 
 	return strings.Join(formattedLines, "\n")
 }
+
+func FormatSearchedSecret(secret data.Secret) string {
+	var b strings.Builder
+
+	b.WriteString(MainTheme.Render(secret.Name))
+	b.WriteString(" ")
+	b.WriteString(MiscStyle.Render("="))
+	b.WriteString(" ")
+	b.WriteString(NoStyle.Render(secret.Value))
+
+	return b.String()
+}
+
+func FormatSearchedAlias(alias data.Alias) string {
+	var b strings.Builder
+	cmds := strings.Split(alias.Command, " ")
+
+	b.WriteString(MainTheme.Render(alias.Name))
+	b.WriteString(" ")
+	b.WriteString(MiscStyle.Render("="))
+	b.WriteString(" ")
+	for i, command := range cmds {
+		if command == "${ion}" {
+			if i != 0 {
+				b.WriteString(" ")
+			}
+			b.WriteString(MiscStyle.Render(command))
+			if i != len(cmds)-1 {
+				b.WriteString(" ")
+			}
+		} else {
+			if i != 0 {
+				b.WriteString(" ")
+			}
+			b.WriteString(NoStyle.Render(command))
+			if i != len(cmds)-1 {
+				b.WriteString(" ")
+			}
+		}
+	}
+	return b.String()
+}

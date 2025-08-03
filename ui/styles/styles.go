@@ -62,6 +62,10 @@ var (
 				Bold(true).
 				Padding(0, 1)
 
+	SystemMessageStyle = NoStyle.
+				Bold(true).
+				Padding(0, 1)
+
 	PagerContentStyle = lipgloss.NewStyle().
 				Padding(0, 2)
 
@@ -131,7 +135,7 @@ func FormatCommandOutput(output string, isSystemCmd bool) string {
 	}
 
 	if isSystemCmd {
-		return FormatSystemMessage(output)
+		return FormatSystemMessage(trimmedOutput)
 	}
 
 	return FormatSuccessMessage(trimmedOutput)
@@ -146,5 +150,5 @@ func FormatErrorMessage(message string) string {
 }
 
 func FormatSystemMessage(message string) string {
-	return NoStyle.Render(message)
+	return SystemMessageStyle.Render(message)
 }

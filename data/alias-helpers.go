@@ -3,6 +3,8 @@ package data
 import (
 	"errors"
 	"strings"
+
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 func (s *Data) buildAliasIndex() {
@@ -100,4 +102,27 @@ func (s *Data) extractAliasArgs(args []string) (string, []string, error) {
 	}
 
 	return "", nil, errors.New("invalid arguments, use ion alias add <alias-name>=<command> with a '=' in between")
+}
+
+func (s *Data) fuzzySearchAlias(name string) (int, error) {
+	if len(s.Aliases) == 0 {
+		return -1, errors.New("alias was not found")
+	}
+
+	idToIndex := make(map[string]int, len(s.Aliases))
+	aliasIds := make([]string, len(s.Aliases))
+
+	for i, secret := range s.Aliases {
+		aliasIds[i] = secret.Name
+		idToIndex[secret.Name] = i
+	}
+
+	results := fuzzy.RankFind(name, aliasIds)
+
+	if len(results) == 0 {
+		return -1, errors.New("alias was not found")
+	}
+
+	bestMatch := results[0].Target
+	return idToIndex[bestMatch], nil
 }

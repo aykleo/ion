@@ -29,6 +29,7 @@ type IData interface {
 	RenameAlias(args []string, path string) error
 	RemoveAlias(args []string, path string) error
 	ListAliases(args []string, path string) ([]Alias, bool, error)
+	SearchAlias(args []string) ([]Alias, error)
 }
 
 func NewData() IData {
