@@ -8,26 +8,26 @@ import (
 )
 
 const (
-	MainThemeColor      = "123"
-	FolderColor         = "2"
-	SuccessColor        = "42"
-	ErrorColor          = "203"
-	CommandColor        = "4"
-	OutputColor         = "7"
-	TableHeaderColor    = "6"
-	TableBorderColor    = "8"
-	MiscColor           = "212"
-	FadedColor          = "244"
+	MainThemeColor   = "123"
+	FolderColor      = "2"
+	SuccessColor     = "42"
+	ErrorColor       = "203"
+	CommandColor     = "4"
+	OutputColor      = "7"
+	TableHeaderColor = "6"
+	TableBorderColor = "8"
+	MiscColor        = "212"
+	FadedColor       = "244"
 )
 
 var (
-	MainTheme           = lipgloss.NewStyle().Foreground(lipgloss.Color(MainThemeColor))
-	Placeholder         = MainTheme.Italic(true).Faint(true)
-	FolderStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color(FolderColor)).Bold(false).Padding(1).Background(lipgloss.Color(MainThemeColor))
-	TerminalStyle       = lipgloss.NewStyle().Padding(1, 2)
-	NoStyle             = lipgloss.NewStyle()
-	MiscStyle           = lipgloss.NewStyle().Foreground(lipgloss.Color(MiscColor))
-	FadedStyle          = lipgloss.NewStyle().Foreground(lipgloss.Color(FadedColor))
+	MainTheme     = lipgloss.NewStyle().Foreground(lipgloss.Color(MainThemeColor))
+	Placeholder   = MainTheme.Italic(true).Faint(true)
+	FolderStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color(FolderColor)).Bold(false).Padding(1).Background(lipgloss.Color(MainThemeColor))
+	TerminalStyle = lipgloss.NewStyle().Padding(1, 2)
+	NoStyle       = lipgloss.NewStyle()
+	MiscStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color(MiscColor))
+	FadedStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color(FadedColor))
 )
 
 var (
@@ -112,7 +112,7 @@ func FormatCommandPrompt(command, username string) string {
 	return CommandPromptStyle.Render(b.String())
 }
 
-func FormatCommandOutput(output string) string {
+func FormatCommandOutput(output string, isSystemCmd bool) string {
 	if output == "" {
 		return ""
 	}
@@ -130,6 +130,10 @@ func FormatCommandOutput(output string) string {
 		return formatJsonOutput(trimmedOutput)
 	}
 
+	if isSystemCmd {
+		return FormatSystemMessage(output)
+	}
+
 	return FormatSuccessMessage(trimmedOutput)
 }
 
@@ -139,4 +143,8 @@ func FormatSuccessMessage(message string) string {
 
 func FormatErrorMessage(message string) string {
 	return ErrorMessageStyle.Render("✗ " + message)
+}
+
+func FormatSystemMessage(message string) string {
+	return NoStyle.Render(message)
 }

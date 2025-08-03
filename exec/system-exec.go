@@ -26,10 +26,11 @@ func ExecSysCommand(command string, args []string) tea.Cmd {
 		output, err := cmd.CombinedOutput()
 
 		return CommandFinishedMsg{
-			Err:     err,
-			Command: fullCommand,
-			Output:  string(output),
-			NewDir:  currentDir,
+			IsSystemCmd: true,
+			Err:         err,
+			Command:     fullCommand,
+			Output:      string(output),
+			NewDir:      currentDir,
 		}
 	}
 }
@@ -39,9 +40,10 @@ func handleCDCommand(fullCommand string) CommandFinishedMsg {
 		if homeDir, err := os.UserHomeDir(); err == nil {
 			currentDir = homeDir
 			return CommandFinishedMsg{
-				Command: fullCommand,
-				// Output:  "moved to " + currentDir,
-				NewDir: currentDir,
+				IsSystemCmd: true,
+				Command:     fullCommand,
+				Output:      "moved to " + currentDir,
+				NewDir:      currentDir,
 			}
 		}
 	}
@@ -73,8 +75,9 @@ func handleCDCommand(fullCommand string) CommandFinishedMsg {
 	currentDir = targetPath
 
 	return CommandFinishedMsg{
-		Command: fullCommand,
-		// Output:  "moved to " + currentDir,
-		NewDir: currentDir,
+		IsSystemCmd: true,
+		Command:     fullCommand,
+		Output:      "moved to " + currentDir,
+		NewDir:      currentDir,
 	}
 }

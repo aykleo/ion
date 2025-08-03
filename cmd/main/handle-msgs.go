@@ -145,7 +145,7 @@ func (m *terminal) finishCommand(msg exec.CommandFinishedMsg) (tea.Model, tea.Cm
 	}
 
 	if msg.Output != "" {
-		formattedOutput := styles.FormatCommandOutput(msg.Output)
+		formattedOutput := styles.FormatCommandOutput(msg.Output, msg.IsSystemCmd)
 		_, pagerCmdOutput := m.pager.AppendCommand(formattedOutput)
 		return m, pagerCmdOutput
 	}
