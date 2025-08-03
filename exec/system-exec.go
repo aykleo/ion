@@ -16,6 +16,12 @@ func ExecSysCommand(command string, args []string) tea.Cmd {
 	}
 
 	return func() tea.Msg {
+		isClear := checkForClearCommand(fullCommand)
+
+		if isClear {
+			return CommandClearMsg{}
+		}
+
 		if strings.HasPrefix(strings.ToLower(strings.TrimSpace(fullCommand)), "cd ") {
 			return handleCDCommand(fullCommand)
 		}
@@ -34,6 +40,14 @@ func ExecSysCommand(command string, args []string) tea.Cmd {
 		}
 	}
 }
+
+func checkForClearCommand(fullCommand string) bool {
+	if strings.HasPrefix(strings.ToLower(strings.TrimSpace(fullCommand)), "cls") || strings.HasPrefix(strings.ToLower(strings.TrimSpace(fullCommand)), "clear") {
+		return true
+	}
+	return false
+}
+
 func handleCDCommand(fullCommand string) CommandFinishedMsg {
 	parts := strings.Fields(fullCommand)
 	if len(parts) < 2 {

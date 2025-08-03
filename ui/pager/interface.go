@@ -12,6 +12,7 @@ type IPager interface {
 	SetCurrentFolder(path string)
 
 	AppendCommand(msg string) (UpdateContentMsg, tea.Cmd)
+	ResetMsgs()
 }
 
 func NewPager() IPager {
@@ -63,4 +64,8 @@ func (m *Pager) AppendCommand(msg string) (UpdateContentMsg, tea.Cmd) {
 	return UpdateContentMsg{}, func() tea.Msg {
 		return UpdateContentMsg{}
 	}
+}
+
+func (m *Pager) ResetMsgs() {
+	m.content = []string{}
 }

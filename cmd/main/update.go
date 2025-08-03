@@ -45,6 +45,9 @@ func (m terminal) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case exec.CommandFinishedMsg:
 		return m.finishCommand(msg)
+
+	case exec.CommandClearMsg:
+		m.pager.ResetMsgs()
 	}
 
 	_, inputCmd := m.input.Update(msg)

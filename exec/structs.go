@@ -7,3 +7,5 @@ type CommandFinishedMsg struct {
 	Output      string
 	NewDir      string
 }
+
+type CommandClearMsg struct{}
