@@ -22,6 +22,8 @@ func (m *Pager) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+s":
 			m.viewport.ScrollDown(2)
 			return m, nil
+		default:
+			return m, nil
 		}
 
 	case tea.WindowSizeMsg:
