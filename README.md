@@ -153,6 +153,7 @@ Use `&&` between commands. Ion will resolve aliases and Ion-subcommands per segm
 - Autocomplete
 - UI finish/polish
 - GitHub Actions (CI)
+- "ionize" command to auto generate $env PATH for global ion execution
 
 ## Notes
 - Ion is designed for Windows and uses PowerShell for system execution.
